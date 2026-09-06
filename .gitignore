@@ -1,0 +1,9 @@
+# Godot 4 缓存目录（编辑器自动生成，勿提交）
+.godot/
+
+# macOS
+.DS_Store
+
+# 导出产物
+*.tmp
+build/
