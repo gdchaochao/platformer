@@ -1,0 +1,35 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/enemies/walker.gd" id="1_walker"]
+
+[sub_resource type="CircleShape2D" id="Sh_body"]
+radius = 12.0
+
+[sub_resource type="CircleShape2D" id="Sh_hurt"]
+radius = 14.0
+
+[node name="Walker" type="CharacterBody2D"]
+script = ExtResource("1_walker")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("Sh_body")
+
+[node name="Body" type="Polygon2D" parent="."]
+color = Color(0.717647, 0.258824, 0.223529, 1)
+polygon = PackedVector2Array(12, 0, 8.5, 8.5, 0, 12, -8.5, 8.5, -12, 0, -8.5, -8.5, 0, -12, 8.5, -8.5)
+
+[node name="EyeL" type="Polygon2D" parent="."]
+color = Color(0.98, 0.94, 0.85, 1)
+polygon = PackedVector2Array(-6, -4, -3, -4, -3, -1, -6, -1)
+
+[node name="EyeR" type="Polygon2D" parent="."]
+color = Color(0.98, 0.94, 0.85, 1)
+polygon = PackedVector2Array(3, -4, 6, -4, 6, -1, 3, -1)
+
+[node name="Hurtbox" type="Area2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("Sh_hurt")
+
+[node name="EdgeRay" type="RayCast2D" parent="."]
+position = Vector2(12, 0)
+target_position = Vector2(0, 26)

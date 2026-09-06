@@ -9,7 +9,8 @@ extends CharacterBody2D
 @export var ground_accel: float = 2200.0     # 地面加速
 @export var air_accel: float = 1400.0        # 空中加速（空中操控性）
 @export var friction: float = 2000.0         # 地面松手减速
-@export var jump_velocity: float = -470.0    # 起跳初速度（负 = 向上）
+@export var jump_velocity: float = -530.0    # 起跳初速度（负 = 向上）≈143px 跳高
+@export var bounce_velocity: float = -340.0  # 踩到敌人头顶的反弹速度
 @export var gravity_scale_hold: float = 1.0  # 按住跳跃键时的重力倍率（跳得高）
 @export var gravity_scale_release: float = 1.8  # 松开跳跃键的重力倍率（快速落下=可调跳跃高度）
 @export var jump_buffer_time: float = 0.12   # 落地前按跳跃的宽容时间
@@ -20,6 +21,7 @@ var _jump_buffer: float = 0.0
 var _coyote: float = 0.0
 var _on_ground_last: bool = false
 var _jump_held_last: bool = false
+var invulnerable: bool = false   # 受伤无敌帧期间忽略再次伤害
 
 @onready var _cap: Polygon2D = $Cap
 @onready var _body: Polygon2D = $Body
@@ -88,6 +90,27 @@ func _flip(dir: float) -> void:
 		scale.x = 1.0
 	elif dir < 0.0 and scale.x > 0.0:
 		scale.x = -1.0
+
+
+## 踩到敌人头顶时的反弹
+func bounce() -> void:
+	velocity.y = bounce_velocity
+
+
+## 受伤（尖刺/敌人碰撞）：无敌帧内忽略；扣命后由关卡把玩家传送回出生点
+func take_hit() -> void:
+	if invulnerable:
+		return
+	invulnerable = true
+	Game.hurt_player()
+	if not is_inside_tree():
+		return
+	# 无敌闪烁 1.1 秒（tween 挂在节点上，场景重载时自动销毁）
+	var tw := create_tween()
+	for i in range(4):
+		tw.tween_property(self, "modulate:a", 0.35, 0.14)
+		tw.tween_property(self, "modulate:a", 1.0, 0.14)
+	tw.tween_callback(func() -> void: invulnerable = false)
 
 
 ## 受伤闪烁（占位：之后可换真正的受伤动画/无敌帧）

@@ -4,10 +4,14 @@ extends Node2D
 ##   "coins"     → Area2D 金币（吃到 +1）
 ##   "killzone"  → Area2D 坠落/陷阱区（碰到扣一条命）
 ##   "goal"      → Area2D 终点旗帜（触发通关）
-##   "hazard"    → Area2D 尖刺/敌人（预留，后续加伤害逻辑）
+##   "hazard"    → Area2D 尖刺等静态危险物（带无敌帧判定的伤害）
+## 敌人（walker）的伤害/踩踏由敌人场景自己处理，不走这里。
 
 var _won: bool = false
+var _coins_total: int = 0  # 开局缓存金币总数（避免吃到后分母变小）
 
+@onready var _player: CharacterBody2D = $Player
+@onready var _spawn: Marker2D = $Spawn
 @onready var _coins_label: Label = $HUD/CoinsLabel
 @onready var _win_label: Label = $HUD/WinLabel
 
@@ -22,21 +26,32 @@ func _ready() -> void:
 	# 金币/生命变化实时刷新 HUD
 	Game.coins_changed.connect(func(_v: int) -> void: _refresh_hud())
 	Game.lives_changed.connect(func(_v: int) -> void: _refresh_hud())
+	# 受伤未死：传送回出生点
+	Game.player_hurt.connect(_on_player_hurt)
 
-	# 连接三类交互物（按 group 自动装配，场景里新增同组节点无需改代码）
+	# 连接各类交互物（按 group 自动装配，场景里新增同组节点无需改代码）
 	for coin: Area2D in get_tree().get_nodes_in_group("coins"):
 		coin.body_entered.connect(_on_coin_body_entered.bind(coin))
+	_coins_total = get_tree().get_nodes_in_group("coins").size()
 	for kill: Area2D in get_tree().get_nodes_in_group("killzone"):
 		kill.body_entered.connect(_on_killzone_body_entered)
 	for goal: Area2D in get_tree().get_nodes_in_group("goal"):
 		goal.body_entered.connect(_on_goal_body_entered)
+	for hazard: Area2D in get_tree().get_nodes_in_group("hazard"):
+		hazard.body_entered.connect(_on_hazard_body_entered)
 
 	_refresh_hud()
 
 
+func _on_player_hurt() -> void:
+	if not is_instance_valid(_player):
+		return
+	_player.global_position = _spawn.global_position
+	_player.velocity = Vector2.ZERO
+
+
 func _refresh_hud() -> void:
-	var total: int = get_tree().get_nodes_in_group("coins").size()
-	_coins_label.text = "金币 %d/%d    生命 %d" % [Game.coins, total, Game.lives]
+	_coins_label.text = "金币 %d/%d    生命 %d" % [Game.coins, _coins_total, Game.lives]
 
 
 func _on_coin_body_entered(body: Node2D, coin: Area2D) -> void:
@@ -46,8 +61,14 @@ func _on_coin_body_entered(body: Node2D, coin: Area2D) -> void:
 
 
 func _on_killzone_body_entered(body: Node2D) -> void:
+	# 坠落必扣命（不受无敌帧保护），传送回出生点由 player_hurt 信号完成
 	if body.is_in_group("player") and not _won:
 		Game.hurt_player()
+
+
+func _on_hazard_body_entered(body: Node2D) -> void:
+	if body.is_in_group("player") and not _won and body.has_method("take_hit"):
+		body.take_hit()
 
 
 func _on_goal_body_entered(body: Node2D) -> void:

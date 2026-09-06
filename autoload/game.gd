@@ -5,6 +5,7 @@ extends Node
 
 signal coins_changed(value: int)
 signal lives_changed(value: int)
+signal player_hurt  # 玩家受伤但生命未耗尽：关卡负责把玩家传送回出生点
 
 const START_LEVEL: String = "res://scenes/levels/level_1_1.tscn"
 
@@ -44,7 +45,7 @@ func add_coin(amount: int = 1) -> void:
 	coins_changed.emit(coins)
 
 
-## 受到一次伤害：扣一条命；生命耗尽则整轮重来
+## 受到一次伤害：扣一条命；生命未耗尽则通知关卡传送玩家回出生点，耗尽则整轮重来
 func hurt_player() -> void:
 	lives -= 1
 	lives_changed.emit(lives)
@@ -54,7 +55,7 @@ func hurt_player() -> void:
 		reload_current_level()
 	else:
 		print("受伤，当前生命: %d" % lives)
-		reload_current_level()
+		player_hurt.emit()
 
 
 ## 通关：看顺序表里还有没有下一关
