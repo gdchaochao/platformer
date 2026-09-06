@@ -22,6 +22,11 @@ var coins: int = 0
 
 
 func _ready() -> void:
+	# 全局回退字体：开源中文像素字体（Fusion Pixel, OFL）
+	# 解决 Godot 默认字体不含中文导致 HUD/菜单显示方块的问题
+	var pixel_font: Font = load("res://assets/fonts/fusion_pixel.otf")
+	if pixel_font:
+		ThemeDB.fallback_font = pixel_font
 	reset_run()
 
 

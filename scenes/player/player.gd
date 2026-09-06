@@ -19,6 +19,7 @@ extends CharacterBody2D
 var _jump_buffer: float = 0.0
 var _coyote: float = 0.0
 var _on_ground_last: bool = false
+var _jump_held_last: bool = false
 
 @onready var _cap: Polygon2D = $Cap
 @onready var _body: Polygon2D = $Body
@@ -38,11 +39,13 @@ func _physics_process(delta: float) -> void:
 	# 跳跃输入：空格 / W / 上方向
 	var jump_pressed: bool = _down(KEY_SPACE) or _down(KEY_W) or _down(KEY_UP)
 
-	# --- 跳跃缓冲：在空中按下的跳跃键保留一小段时间，落地瞬间自动起跳 ---
-	if jump_pressed and not _on_ground_last:
+	# --- 跳跃缓冲：检测"新按下"（边沿触发）时置位缓冲，落地瞬间自动起跳 ---
+	# 注意：不能用"是否在地面"判断，否则站在地面按跳跃永远无法起跳！
+	if jump_pressed and not _jump_held_last:
 		_jump_buffer = jump_buffer_time
 	else:
 		_jump_buffer = maxf(_jump_buffer - delta, 0.0)
+	_jump_held_last = jump_pressed
 
 	# --- 土狼时间：离开平台边缘后的一小段时间仍允许起跳 ---
 	if is_on_floor():
