@@ -27,17 +27,16 @@ var _on_ground_last: bool = false
 
 
 func _physics_process(delta: float) -> void:
-	# 水平输入：A/D 或 方向键（用 physical keycode，跨键盘布局稳定）
+	# 水平输入：A/D 或 方向键
+	# 同时检测物理键与逻辑键：桌面两者一致；Web 浏览器只可靠支持逻辑键(key)。
 	var dir: float = 0.0
-	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT):
+	if _down(KEY_A) or _down(KEY_LEFT):
 		dir -= 1.0
-	if Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT):
+	if _down(KEY_D) or _down(KEY_RIGHT):
 		dir += 1.0
 
 	# 跳跃输入：空格 / W / 上方向
-	var jump_pressed: bool = Input.is_physical_key_pressed(KEY_SPACE) \
-		or Input.is_physical_key_pressed(KEY_W) \
-		or Input.is_physical_key_pressed(KEY_UP)
+	var jump_pressed: bool = _down(KEY_SPACE) or _down(KEY_W) or _down(KEY_UP)
 
 	# --- 跳跃缓冲：在空中按下的跳跃键保留一小段时间，落地瞬间自动起跳 ---
 	if jump_pressed and not _on_ground_last:
@@ -74,6 +73,11 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	_on_ground_last = is_on_floor()
+
+
+## 同时检测物理键与逻辑键（Web 平台 physical keycode 不可靠，需逻辑键兜底）
+func _down(k: Key) -> bool:
+	return Input.is_physical_key_pressed(k) or Input.is_key_pressed(k)
 
 
 func _flip(dir: float) -> void:
