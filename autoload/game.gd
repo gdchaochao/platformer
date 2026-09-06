@@ -1,38 +1,56 @@
 extends Node
 ## 全局游戏状态单例（Autoload: Game）
-## 职责：跨场景的生命/金币计数、关卡顺序表、场景切换。
-## 未来扩展：存档系统、设置项、BGM 播放等都挂到这里。
+## 职责：跨场景的生命/金币计数、关卡顺序表、输入动作注册、场景切换。
 
 signal coins_changed(value: int)
 signal lives_changed(value: int)
-signal player_hurt  # 玩家受伤但生命未耗尽：关卡负责把玩家传送回出生点
+signal player_hurt   # 玩家受伤但生命未耗尽：关卡负责把玩家传送回出生点
+signal game_over     # 生命耗尽：关卡负责显示 Game Over 画面
 
 const START_LEVEL: String = "res://scenes/levels/level_1_1.tscn"
 
-# 关卡顺序表（这就是"推进"的主干）。
-# 每关一个条目：scene 场景路径 + world 所属世界 + display 显示名。
-# 后续接入水墨山水 World2 时，只要在数组后面追加：
+# 关卡顺序表（推进主干）。水墨 World2 接入示例：
 #   { "scene": "res://scenes/levels/world2_ink/level_2_1.tscn", "world": "ink", "display": "水墨山水 2-1" }
-# 再创建对应场景文件，关卡流程就会自动串起来。
 const LEVEL_SEQUENCE: Array[Dictionary] = [
 	{ "scene": "res://scenes/levels/level_1_1.tscn", "world": "forest", "display": "森林王国 1-1 苏醒之林" },
 ]
 
 var lives: int = 3
 var coins: int = 0
+var is_game_over: bool = false
 
 
 func _ready() -> void:
+	# 输入动作必须最先注册（后续场景的 _physics_process 依赖它们）
+	_setup_input()
 	# 全局回退字体：开源中文像素字体（Fusion Pixel, OFL）
-	# 解决 Godot 默认字体不含中文导致 HUD/菜单显示方块的问题
 	var pixel_font: Font = load("res://assets/fonts/fusion_pixel.otf")
 	if pixel_font:
 		ThemeDB.fallback_font = pixel_font
 	reset_run()
 
 
-## 开始新的一轮（生命/金币归零，常用于死亡次数耗尽后重新开始）
+## 用代码注册输入动作（比手写 project.godot 的 Object() 序列更可靠）
+## 只绑逻辑键 keycode：Web 平台 physical keycode 不可靠（已踩坑）
+func _setup_input() -> void:
+	_add_action("move_left", [KEY_A, KEY_LEFT])
+	_add_action("move_right", [KEY_D, KEY_RIGHT])
+	_add_action("jump", [KEY_SPACE, KEY_W, KEY_UP])
+
+
+func _add_action(action: String, keys: Array) -> void:
+	if InputMap.has_action(action):
+		return
+	InputMap.add_action(action)
+	for k: Key in keys:
+		var ev := InputEventKey.new()
+		ev.keycode = k
+		InputMap.action_add_event(action, ev)
+
+
+## 开始新的一轮（生命/金币归零）
 func reset_run() -> void:
+	is_game_over = false
 	lives = 3
 	coins = 0
 	coins_changed.emit(coins)
@@ -45,14 +63,17 @@ func add_coin(amount: int = 1) -> void:
 	coins_changed.emit(coins)
 
 
-## 受到一次伤害：扣一条命；生命未耗尽则通知关卡传送玩家回出生点，耗尽则整轮重来
+## 受到一次伤害：扣一条命。
+## 生命未耗尽 → 通知关卡把玩家传送回出生点；耗尽 → 发 game_over（不自动重开）。
 func hurt_player() -> void:
+	if is_game_over:
+		return
 	lives -= 1
 	lives_changed.emit(lives)
 	if lives <= 0:
-		print("生命耗尽，整轮重新开始")
-		reset_run()
-		reload_current_level()
+		is_game_over = true
+		print("游戏结束")
+		game_over.emit()
 	else:
 		print("受伤，当前生命: %d" % lives)
 		player_hurt.emit()
@@ -69,7 +90,7 @@ func on_level_cleared(current_scene_path: String) -> void:
 		get_tree().change_scene_to_file(next_level["scene"])
 	else:
 		print("全部关卡完成！")
-		# TODO: 这里跳转到结算/标题场景
+		reset_run()
 		get_tree().change_scene_to_file(START_LEVEL)
 
 

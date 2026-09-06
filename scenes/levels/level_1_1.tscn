@@ -211,6 +211,11 @@ position = Vector2(80, 308)
 position = Vector2(80, 308)
 
 [node name="HUD" type="CanvasLayer" parent="."]
+[node name="GameOverRect" type="ColorRect" parent="HUD"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.08, 0.05, 0.6)
 [node name="CoinsLabel" type="Label" parent="HUD"]
 offset_left = 12.0
 offset_top = 8.0
@@ -233,4 +238,28 @@ theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.65)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 36
+horizontal_alignment = 1
+[node name="GameOverTitle" type="Label" parent="HUD"]
+visible = false
+anchor_right = 1.0
+offset_top = 120.0
+offset_bottom = 190.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(0.95, 0.4, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 72
+text = "游戏结束"
+horizontal_alignment = 1
+[node name="GameOverHint" type="Label" parent="HUD"]
+visible = false
+anchor_right = 1.0
+offset_top = 210.0
+offset_bottom = 250.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "按 空格键 重新开始"
 horizontal_alignment = 1

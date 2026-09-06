@@ -9,6 +9,8 @@ extends Node2D
 
 var _won: bool = false
 var _coins_total: int = 0  # 开局缓存金币总数（避免吃到后分母变小）
+var _game_over: bool = false
+var _game_over_at_ms: int = 0
 
 @onready var _player: CharacterBody2D = $Player
 @onready var _spawn: Marker2D = $Spawn
@@ -28,6 +30,8 @@ func _ready() -> void:
 	Game.lives_changed.connect(func(_v: int) -> void: _refresh_hud())
 	# 受伤未死：传送回出生点
 	Game.player_hurt.connect(_on_player_hurt)
+	# 生命耗尽：显示 Game Over，玩家按键后重开
+	Game.game_over.connect(_on_game_over)
 
 	# 连接各类交互物（按 group 自动装配，场景里新增同组节点无需改代码）
 	for coin: Area2D in get_tree().get_nodes_in_group("coins"):
@@ -48,6 +52,26 @@ func _on_player_hurt() -> void:
 		return
 	_player.global_position = _spawn.global_position
 	_player.velocity = Vector2.ZERO
+
+
+func _on_game_over() -> void:
+	_game_over = true
+	_game_over_at_ms = Time.get_ticks_msec()
+	if is_instance_valid(_player):
+		_player.set_physics_process(false)  # 冻结玩家操作
+	$HUD/GameOverRect.visible = true
+	$HUD/GameOverTitle.visible = true
+	$HUD/GameOverHint.visible = true
+
+
+func _process(_delta: float) -> void:
+	# Game Over 后 0.8 秒防误按，再按跳跃键重开整轮
+	if not _game_over:
+		return
+	if Time.get_ticks_msec() - _game_over_at_ms > 800 and Input.is_action_just_pressed("jump"):
+		_game_over = false
+		Game.reset_run()
+		get_tree().reload_current_scene()
 
 
 func _refresh_hud() -> void:
