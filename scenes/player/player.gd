@@ -58,6 +58,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y = jump_velocity
 		_jump_buffer = 0.0
 		_coyote = 0.0
+		Game.play_sfx("jump")
 
 	# --- 水平移动（地面/空中不同加速，移动时翻转朝向） ---
 	var accel: float = ground_accel if is_on_floor() else air_accel
@@ -88,6 +89,7 @@ func take_hit() -> void:
 	if invulnerable:
 		return
 	invulnerable = true
+	Game.play_sfx("hurt")
 	Game.hurt_player()
 	if not is_inside_tree():
 		return

@@ -25,6 +25,7 @@ var _game_over_at_ms: int = 0
 func _ready() -> void:
 	# 每关自己的天空色
 	RenderingServer.set_default_clear_color(sky_color)
+	Game.play_music("level")
 
 	_win_label.visible = false
 	_win_label.text = ""
@@ -68,6 +69,8 @@ func _on_player_hurt() -> void:
 func _on_game_over() -> void:
 	_game_over = true
 	_game_over_at_ms = Time.get_ticks_msec()
+	Game.stop_music()
+	Game.play_sfx("game_over")
 	if is_instance_valid(_player):
 		_player.set_physics_process(false)  # 冻结玩家操作
 	$HUD/GameOverRect.visible = true
@@ -92,6 +95,7 @@ func _refresh_hud() -> void:
 func _on_coin_body_entered(body: Node2D, coin: Area2D) -> void:
 	if body.is_in_group("player"):
 		coin.queue_free()
+		Game.play_sfx("coin")
 		Game.add_coin(1)
 
 
@@ -111,6 +115,7 @@ func _on_goal_body_entered(body: Node2D) -> void:
 		_won = true
 		_win_label.text = "旗帜到手！%s" % Game.display_name(scene_file_path)
 		_win_label.visible = true
+		Game.play_sfx("win")
 		# 演示推进：等待 1.5 秒后按关卡顺序表前进
 		await get_tree().create_timer(1.5).timeout
 		Game.on_level_cleared(scene_file_path)

@@ -4,6 +4,7 @@ extends Node2D
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(Color(0.72, 0.87, 0.68))
+	Game.play_music("menu")
 	# 立绘蘑菇人：冻结物理，当作装饰
 	var player: Node = get_node_or_null("Player")
 	if player:
@@ -19,4 +20,5 @@ func _process(_delta: float) -> void:
 
 
 func _start() -> void:
+	Game.play_sfx("click")
 	get_tree().change_scene_to_file(Game.LEVEL_SEQUENCE[0]["scene"])

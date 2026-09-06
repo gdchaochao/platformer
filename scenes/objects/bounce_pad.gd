@@ -18,6 +18,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if body is CharacterBody2D and (body as CharacterBody2D).velocity.y < -50.0:
 		return
 	(body as CharacterBody2D).velocity.y = launch_velocity
+	Game.play_sfx("bounce")
 	_squash()
 
 

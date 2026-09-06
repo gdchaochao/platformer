@@ -59,6 +59,7 @@ func _interact_players() -> void:
 			continue  # 正在上升：本帧不判定
 		if feet > STOMP_TOP and feet < STOMP_BOTTOM:
 			# 玩家脚落在怪头顶区间 → 踩死 + 反弹
+			Game.play_sfx("stomp")
 			if body.has_method("bounce"):
 				body.bounce()
 			queue_free()

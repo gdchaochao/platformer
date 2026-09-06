@@ -21,6 +21,27 @@ var lives: int = 3
 var coins: int = 0
 var is_game_over: bool = false
 
+# ---------- 音频 ----------
+const SFX_PATHS: Dictionary = {
+	"jump": "res://assets/audio/sfx/jump.wav",
+	"coin": "res://assets/audio/sfx/coin.wav",
+	"hurt": "res://assets/audio/sfx/hurt.wav",
+	"stomp": "res://assets/audio/sfx/stomp.wav",
+	"bounce": "res://assets/audio/sfx/bounce.wav",
+	"win": "res://assets/audio/sfx/win.wav",
+	"game_over": "res://assets/audio/sfx/game_over.wav",
+	"click": "res://assets/audio/sfx/click.wav",
+}
+const MUSIC_PATHS: Dictionary = {
+	"menu": "res://assets/audio/music/menu_theme.wav",
+	"level": "res://assets/audio/music/level_theme.wav",
+}
+const SFX_POOL_SIZE := 8
+
+var _sfx_pool: Array[AudioStreamPlayer] = []
+var _music: AudioStreamPlayer
+var _music_track: String = ""
+
 
 func _ready() -> void:
 	# 输入动作必须最先注册（后续场景的 _physics_process 依赖它们）
@@ -29,7 +50,48 @@ func _ready() -> void:
 	var pixel_font: Font = load("res://assets/fonts/fusion_pixel.otf")
 	if pixel_font:
 		ThemeDB.fallback_font = pixel_font
+	_setup_audio()
 	reset_run()
+
+
+## 音效池（8 路并发）+ BGM 播放器（finished 信号实现无缝循环）
+func _setup_audio() -> void:
+	for i in SFX_POOL_SIZE:
+		var p := AudioStreamPlayer.new()
+		add_child(p)
+		_sfx_pool.append(p)
+	_music = AudioStreamPlayer.new()
+	_music.volume_db = -12.0
+	_music.finished.connect(func() -> void: _music.play())
+	add_child(_music)
+
+
+## 播放音效（池满时静默丢弃，避免卡顿）
+func play_sfx(sfx_name: String, volume_db: float = -6.0) -> void:
+	var path: String = SFX_PATHS.get(sfx_name, "")
+	if path == "":
+		push_warning("未知音效: %s" % sfx_name)
+		return
+	for p in _sfx_pool:
+		if not p.playing:
+			p.stream = load(path)
+			p.volume_db = volume_db
+			p.play()
+			return
+
+
+## 播放 BGM：同名曲目已在播则不打断（跨场景无缝）
+func play_music(music_name: String) -> void:
+	if _music_track == music_name and _music.playing:
+		return
+	_music_track = music_name
+	_music.stream = load(MUSIC_PATHS[music_name])
+	_music.play()
+
+
+func stop_music() -> void:
+	_music_track = ""
+	_music.stop()
 
 
 ## 用代码注册输入动作（比手写 project.godot 的 Object() 序列更可靠）
