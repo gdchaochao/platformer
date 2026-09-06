@@ -107,9 +107,14 @@ func _add_action(action: String, keys: Array) -> void:
 		return
 	InputMap.add_action(action)
 	for k: Key in keys:
+		# 双绑定：同一按键同时注册逻辑键与物理键事件，
+		# 无论 Web 端事件填充的是 keycode 还是 physical_keycode 都能命中
 		var ev := InputEventKey.new()
 		ev.keycode = k
 		InputMap.action_add_event(action, ev)
+		var ev_phys := InputEventKey.new()
+		ev_phys.physical_keycode = k
+		InputMap.action_add_event(action, ev_phys)
 
 
 ## 开始新的一轮（生命/金币归零）

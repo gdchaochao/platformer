@@ -12,6 +12,10 @@ func _ready() -> void:
 	var btn: Button = $UI/StartButton
 	btn.pressed.connect(_start)
 	btn.grab_focus()
+	# Web：确保 canvas 持有键盘焦点
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval(
+			"(function(){var c=document.querySelector('canvas');if(c){try{c.focus();}catch(e){}}})()")
 
 
 func _process(_delta: float) -> void:

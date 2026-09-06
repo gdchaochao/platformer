@@ -20,6 +20,7 @@ extends CharacterBody2D
 var _jump_buffer: float = 0.0
 var _coyote: float = 0.0
 var _on_ground_last: bool = false
+var _jump_held_last: bool = false
 var invulnerable: bool = false   # 受伤无敌帧期间忽略再次伤害
 
 @onready var _cap: Polygon2D = $Cap
@@ -29,16 +30,27 @@ var invulnerable: bool = false   # 受伤无敌帧期间忽略再次伤害
 
 
 func _physics_process(delta: float) -> void:
-	# 输入全部走 InputMap 动作（Game._setup_input 注册）：
-	# 动作系统由引擎维护按键状态，多键同时按住不会互斥，Web/桌面行为一致。
+	# 输入三重保险（不同浏览器/事件字段填充方式下任一路径生效即可）：
+	# ① InputMap 动作（Game._setup_input 逻辑键+物理键双绑）
+	# ② 物理键轮询  ③ 逻辑键轮询
 	var dir: float = Input.get_axis("move_left", "move_right")
-	var jump_pressed: bool = Input.is_action_pressed("jump")
+	if dir == 0.0:
+		if _down(KEY_A) or _down(KEY_LEFT):
+			dir = -1.0
+		elif _down(KEY_D) or _down(KEY_RIGHT):
+			dir = 1.0
 
-	# --- 跳跃缓冲：is_action_just_pressed 引擎级边沿检测，按下瞬间置位 ---
-	if Input.is_action_just_pressed("jump"):
+	var jump_pressed: bool = Input.is_action_pressed("jump") \
+		or _down(KEY_SPACE) or _down(KEY_W) or _down(KEY_UP)
+
+	# --- 跳跃缓冲：动作系统边沿 或 轮询边沿，二者取或 ---
+	var jump_just: bool = Input.is_action_just_pressed("jump") \
+		or (jump_pressed and not _jump_held_last)
+	if jump_just:
 		_jump_buffer = jump_buffer_time
 	else:
 		_jump_buffer = maxf(_jump_buffer - delta, 0.0)
+	_jump_held_last = jump_pressed
 
 	# --- 土狼时间：离开平台边缘后的一小段时间仍允许起跳 ---
 	if is_on_floor():
@@ -77,6 +89,11 @@ func _flip(dir: float) -> void:
 		scale.x = 1.0
 	elif dir < 0.0 and scale.x > 0.0:
 		scale.x = -1.0
+
+
+## 键轮询兜底：物理键与逻辑键都查（不同浏览器事件字段填充有差异）
+func _down(k: Key) -> bool:
+	return Input.is_physical_key_pressed(k) or Input.is_key_pressed(k)
 
 
 ## 踩到敌人头顶时的反弹

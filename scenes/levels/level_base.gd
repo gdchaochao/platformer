@@ -26,6 +26,7 @@ func _ready() -> void:
 	# 每关自己的天空色
 	RenderingServer.set_default_clear_color(sky_color)
 	Game.play_music("level")
+	_focus_canvas_web()
 
 	_win_label.visible = false
 	_win_label.text = ""
@@ -64,6 +65,14 @@ func _on_player_hurt() -> void:
 		return
 	_player.global_position = _spawn.global_position
 	_player.velocity = Vector2.ZERO
+
+
+## Web 平台：从主菜单进入关卡后焦点可能留在别处导致键盘失效，
+## 主动把焦点拉回 canvas（仅 Web 生效）
+func _focus_canvas_web() -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval(
+			"(function(){var c=document.querySelector('canvas');if(c&&document.activeElement!==c){try{c.focus();}catch(e){}}})()")
 
 
 func _on_game_over() -> void:
