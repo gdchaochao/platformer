@@ -8,11 +8,13 @@ signal player_hurt   # 玩家受伤但生命未耗尽：关卡负责把玩家传
 signal game_over     # 生命耗尽：关卡负责显示 Game Over 画面
 
 const START_LEVEL: String = "res://scenes/levels/level_1_1.tscn"
+const MAIN_MENU: String = "res://scenes/ui/main_menu.tscn"
 
 # 关卡顺序表（推进主干）。水墨 World2 接入示例：
 #   { "scene": "res://scenes/levels/world2_ink/level_2_1.tscn", "world": "ink", "display": "水墨山水 2-1" }
 const LEVEL_SEQUENCE: Array[Dictionary] = [
 	{ "scene": "res://scenes/levels/level_1_1.tscn", "world": "forest", "display": "森林王国 1-1 苏醒之林" },
+	{ "scene": "res://scenes/levels/level_1_2.tscn", "world": "forest", "display": "森林王国 1-2 黄昏林地" },
 ]
 
 var lives: int = 3
@@ -79,7 +81,7 @@ func hurt_player() -> void:
 		player_hurt.emit()
 
 
-## 通关：看顺序表里还有没有下一关
+## 通关：看顺序表里还有没有下一关；全通完回主菜单
 func on_level_cleared(current_scene_path: String) -> void:
 	var idx: int = _index_of(current_scene_path)
 	if idx < 0:
@@ -91,7 +93,13 @@ func on_level_cleared(current_scene_path: String) -> void:
 	else:
 		print("全部关卡完成！")
 		reset_run()
-		get_tree().change_scene_to_file(START_LEVEL)
+		get_tree().change_scene_to_file(MAIN_MENU)
+
+
+## 取关卡显示名（供关卡开场标题用）
+func display_name(scene_path: String) -> String:
+	var idx: int = _index_of(scene_path)
+	return str(LEVEL_SEQUENCE[idx]["display"]) if idx >= 0 else ""
 
 
 func reload_current_level() -> void:

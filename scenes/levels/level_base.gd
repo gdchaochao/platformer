@@ -1,11 +1,14 @@
 extends Node2D
-## 关卡逻辑：森林王国 1-1（苏醒之林）
-## 统一用 group 约定场景里的交互物，避免到处连信号：
+## 通用关卡逻辑（level_1_1 / level_1_2 / 未来所有关卡共用）
+## 场景里用 group 约定交互物，避免到处连信号：
 ##   "coins"     → Area2D 金币（吃到 +1）
 ##   "killzone"  → Area2D 坠落/陷阱区（碰到扣一条命）
 ##   "goal"      → Area2D 终点旗帜（触发通关）
 ##   "hazard"    → Area2D 尖刺等静态危险物（带无敌帧判定的伤害）
-## 敌人（walker）的伤害/踩踏由敌人场景自己处理，不走这里。
+## 敌人（walker）的踩踏/伤害由敌人场景自己处理。
+## 每关定制：sky_color 天空色；关卡名自动从 Game.LEVEL_SEQUENCE 读取。
+
+@export var sky_color: Color = Color(0.72, 0.87, 0.68)  # 每关天空色
 
 var _won: bool = false
 var _coins_total: int = 0  # 开局缓存金币总数（避免吃到后分母变小）
@@ -16,14 +19,22 @@ var _game_over_at_ms: int = 0
 @onready var _spawn: Marker2D = $Spawn
 @onready var _coins_label: Label = $HUD/CoinsLabel
 @onready var _win_label: Label = $HUD/WinLabel
+@onready var _title_label: Label = $HUD/LevelTitle
 
 
 func _ready() -> void:
-	# 全局清屏色：森林天空色（水墨 World2 可改为纸色/青色）
-	RenderingServer.set_default_clear_color(Color(0.72, 0.87, 0.68))
+	# 每关自己的天空色
+	RenderingServer.set_default_clear_color(sky_color)
 
 	_win_label.visible = false
 	_win_label.text = ""
+
+	# 开场关卡名展示（1.6s 后淡出）
+	_title_label.text = Game.display_name(scene_file_path)
+	var tw := create_tween()
+	tw.tween_interval(1.6)
+	tw.tween_property(_title_label, "modulate:a", 0.0, 0.5)
+	tw.tween_callback(func() -> void: _title_label.visible = false)
 
 	# 金币/生命变化实时刷新 HUD
 	Game.coins_changed.connect(func(_v: int) -> void: _refresh_hud())
@@ -98,7 +109,7 @@ func _on_hazard_body_entered(body: Node2D) -> void:
 func _on_goal_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player") and not _won:
 		_won = true
-		_win_label.text = "旗帜到手！%s" % Game.LEVEL_SEQUENCE[0]["display"]
+		_win_label.text = "旗帜到手！%s" % Game.display_name(scene_file_path)
 		_win_label.visible = true
 		# 演示推进：等待 1.5 秒后按关卡顺序表前进
 		await get_tree().create_timer(1.5).timeout

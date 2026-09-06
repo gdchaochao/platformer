@@ -1,0 +1,99 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="FontFile" path="res://assets/fonts/fusion_pixel.otf" id="2_font"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_player"]
+
+[node name="MainMenu" type="Node2D"]
+script = ExtResource("1_menu")
+
+[node name="Sky" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.72, 0.87, 0.68, 1)
+
+[node name="CloudL" type="Polygon2D" parent="."]
+color = Color(1, 1, 1, 0.75)
+polygon = PackedVector2Array(0, -12, 14, -22, 34, -24, 50, -16, 54, -4, 40, 2, 10, 2, -4, -2)
+position = Vector2(130, 70)
+[node name="CloudR" type="Polygon2D" parent="."]
+color = Color(1, 1, 1, 0.75)
+polygon = PackedVector2Array(0, -12, 14, -22, 34, -24, 50, -16, 54, -4, 40, 2, 10, 2, -4, -2)
+position = Vector2(500, 50)
+
+[node name="Ground" type="ColorRect" parent="."]
+anchor_right = 1.0
+offset_top = 320.0
+anchor_bottom = 1.0
+color = Color(0.427451, 0.572549, 0.309804, 1)
+
+[node name="TreeA" type="Node2D" parent="."]
+position = Vector2(80, 320)
+[node name="Trunk" type="Polygon2D" parent="TreeA"]
+color = Color(0.482353, 0.352941, 0.243137, 1)
+polygon = PackedVector2Array(-5, -54, 5, -54, 7, 2, -7, 2)
+[node name="Foliage" type="Polygon2D" parent="TreeA"]
+color = Color(0.247059, 0.419608, 0.227451, 1)
+polygon = PackedVector2Array(0, -104, 27, -84, 24, -52, 0, -38, -24, -52, -27, -84)
+[node name="TreeB" type="Node2D" parent="."]
+position = Vector2(580, 320)
+[node name="Trunk" type="Polygon2D" parent="TreeB"]
+color = Color(0.482353, 0.352941, 0.243137, 1)
+polygon = PackedVector2Array(-5, -54, 5, -54, 7, 2, -7, 2)
+[node name="Foliage" type="Polygon2D" parent="TreeB"]
+color = Color(0.282353, 0.462745, 0.247059, 1)
+polygon = PackedVector2Array(0, -104, 27, -84, 24, -52, 0, -38, -24, -52, -27, -84)
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(320, 308)
+
+[node name="UI" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Title" type="Label" parent="UI"]
+anchor_right = 1.0
+offset_top = 48.0
+offset_bottom = 130.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.18, 0.32, 0.18, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 72
+text = "森林王国"
+horizontal_alignment = 1
+[node name="Subtitle" type="Label" parent="UI"]
+anchor_right = 1.0
+offset_top = 140.0
+offset_bottom = 172.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(0.2, 0.34, 0.2, 1)
+theme_override_font_sizes/font_size = 24
+text = "—— 平台跳跃冒险 ——"
+horizontal_alignment = 1
+[node name="StartButton" type="Button" parent="UI"]
+offset_left = 250.0
+offset_top = 210.0
+offset_right = 390.0
+offset_bottom = 246.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+text = "开始游戏"
+[node name="Hint" type="Label" parent="UI"]
+anchor_right = 1.0
+offset_top = 262.0
+offset_bottom = 288.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(0.2, 0.34, 0.2, 1)
+theme_override_font_sizes/font_size = 16
+text = "按 空格键 开始    A/D 移动    空格 跳跃"
+horizontal_alignment = 1
+[node name="Credit" type="Label" parent="UI"]
+anchor_right = 1.0
+offset_top = 336.0
+offset_bottom = 356.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(1, 1, 1, 0.8)
+theme_override_font_sizes/font_size = 12
+text = "Godot 4.7 制作    字体：Fusion Pixel (OFL)"
+horizontal_alignment = 1
