@@ -10,6 +10,10 @@ signal game_over     # 生命耗尽：关卡负责显示 Game Over 画面
 const START_LEVEL: String = "res://scenes/levels/level_1_1.tscn"
 const MAIN_MENU: String = "res://scenes/ui/main_menu.tscn"
 
+## ⚠️ 调试开关：主菜单显示"关卡选择"面板，可跳任意关（测试用）。
+## 正式上线前改为 false。
+const DEBUG_LEVEL_SELECT: bool = true
+
 # 关卡顺序表（推进主干）。水墨 World2 接入示例：
 #   { "scene": "res://scenes/levels/world2_ink/level_2_1.tscn", "world": "ink", "display": "水墨山水 2-1" }
 const LEVEL_SEQUENCE: Array[Dictionary] = [

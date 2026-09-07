@@ -97,3 +97,24 @@ theme_override_colors/font_color = Color(1, 1, 1, 0.8)
 theme_override_font_sizes/font_size = 12
 text = "Godot 4.7 制作    字体：Fusion Pixel (OFL)"
 horizontal_alignment = 1
+[node name="DebugPanel" type="Control" parent="UI"]
+visible = false
+offset_left = 225.0
+offset_top = 244.0
+offset_right = 415.0
+offset_bottom = 358.0
+[node name="DebugTitle" type="Label" parent="UI/DebugPanel"]
+anchor_right = 1.0
+offset_bottom = 22.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(0.85, 0.45, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.5)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "关卡选择 · 测试"
+horizontal_alignment = 1
+[node name="LevelSelectBox" type="VBoxContainer" parent="UI/DebugPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 26.0
+theme_override_constants/separation = 6

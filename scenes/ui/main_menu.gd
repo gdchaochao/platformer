@@ -1,6 +1,11 @@
 extends Node2D
 ## 主菜单：标题 + 开始游戏
 ## 空格 / 回车 / 点击按钮均可开始。
+## DEBUG_LEVEL_SELECT = true 时右侧显示"关卡选择"测试面板（可跳任意关）。
+
+@onready var _debug_panel: Control = $UI/DebugPanel
+@onready var _level_box: VBoxContainer = $UI/DebugPanel/LevelSelectBox
+
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(Color(0.72, 0.87, 0.68))
@@ -16,6 +21,7 @@ func _ready() -> void:
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval(
 			"(function(){var c=document.querySelector('canvas');if(c){try{c.focus();}catch(e){}}})()")
+	_build_level_select()
 
 
 func _process(_delta: float) -> void:
@@ -26,3 +32,25 @@ func _process(_delta: float) -> void:
 func _start() -> void:
 	Game.play_sfx("click")
 	get_tree().change_scene_to_file(Game.LEVEL_SEQUENCE[0]["scene"])
+
+
+## 测试用关卡选择面板：动态读取关卡顺序表生成按钮。
+## 显隐由 Game.DEBUG_LEVEL_SELECT 控制，上线改 false 即整体隐藏。
+func _build_level_select() -> void:
+	_debug_panel.visible = Game.DEBUG_LEVEL_SELECT
+	if not Game.DEBUG_LEVEL_SELECT:
+		return
+	var font: Font = load("res://assets/fonts/fusion_pixel.otf")
+	for entry: Dictionary in Game.LEVEL_SEQUENCE:
+		var b := Button.new()
+		b.text = str(entry["display"])
+		b.custom_minimum_size = Vector2(190, 26)
+		b.add_theme_font_override("font", font)
+		b.add_theme_font_size_override("font_size", 14)
+		b.pressed.connect(_goto_level.bind(str(entry["scene"])))
+		_level_box.add_child(b)
+
+
+func _goto_level(scene_path: String) -> void:
+	Game.play_sfx("click")
+	get_tree().change_scene_to_file(scene_path)
