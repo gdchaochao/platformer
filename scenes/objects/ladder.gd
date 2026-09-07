@@ -6,9 +6,9 @@ extends Area2D
 
 @export var height: float = 120.0  # 梯子总长（px）
 
-const WIDTH := 22.0
-const COLOR_RAIL := Color(0.55, 0.4, 0.24, 1)
-const COLOR_RUNG := Color(0.68, 0.52, 0.32, 1)
+const WIDTH := 30.0
+const COLOR_RAIL := Color(0.9, 0.76, 0.5, 1)
+const COLOR_RUNG := Color(0.72, 0.58, 0.36, 1)
 
 # 当前在梯子内的 body 列表（body_entered/exited 事件驱动维护，
 # 比每帧 overlaps_body 查询可靠——后者在 _physics_process 时机下状态不稳定）
@@ -26,14 +26,16 @@ func _ready() -> void:
 	cs.position = Vector2(0, height / 2.0)
 
 	# 视觉：两根竖杆
+	# 注意：必须用显式 Vector2() 包装坐标——float 数组字面量会让每个
+	# 数字退化成独立顶点，多边形直接碎成小点（踩过的坑）
 	for side in [-1.0, 1.0]:
 		var rail := Polygon2D.new()
 		rail.color = COLOR_RAIL
 		rail.polygon = PackedVector2Array([
-			side * WIDTH / 2.0 - 2.5 * side, 0.0,
-			side * WIDTH / 2.0 + 2.5 * side, 0.0,
-			side * WIDTH / 2.0 + 2.5 * side, height,
-			side * WIDTH / 2.0 - 2.5 * side, height,
+			Vector2(side * WIDTH / 2.0 - 2.5 * side, 0.0),
+			Vector2(side * WIDTH / 2.0 + 2.5 * side, 0.0),
+			Vector2(side * WIDTH / 2.0 + 2.5 * side, height),
+			Vector2(side * WIDTH / 2.0 - 2.5 * side, height),
 		])
 		add_child(rail)
 	# 横档：每 24px 一根
@@ -42,10 +44,10 @@ func _ready() -> void:
 		var rung := Polygon2D.new()
 		rung.color = COLOR_RUNG
 		rung.polygon = PackedVector2Array([
-			-WIDTH / 2.0 + 2.0, rung_y - 2.0,
-			WIDTH / 2.0 - 2.0, rung_y - 2.0,
-			WIDTH / 2.0 - 2.0, rung_y + 2.0,
-			-WIDTH / 2.0 + 2.0, rung_y + 2.0,
+			Vector2(-WIDTH / 2.0 + 2.0, rung_y - 2.5),
+			Vector2(WIDTH / 2.0 - 2.0, rung_y - 2.5),
+			Vector2(WIDTH / 2.0 - 2.0, rung_y + 2.5),
+			Vector2(-WIDTH / 2.0 + 2.0, rung_y + 2.5),
 		])
 		add_child(rung)
 		rung_y += 24.0

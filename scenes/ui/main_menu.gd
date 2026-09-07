@@ -22,6 +22,21 @@ func _ready() -> void:
 		JavaScriptBridge.eval(
 			"(function(){var c=document.querySelector('canvas');if(c){try{c.focus();}catch(e){}}})()")
 	_build_level_select()
+	_check_debug_level_param()
+
+
+## 测试用：URL 带 ?level=N 时直接进入第 N 关（如 ?level=3 进 1-3）。
+## 仅在 DEBUG_LEVEL_SELECT 开启时生效，正式版无效。
+func _check_debug_level_param() -> void:
+	if not Game.DEBUG_LEVEL_SELECT or not OS.has_feature("web"):
+		return
+	var q: String = str(JavaScriptBridge.eval("location.search"))
+	var idx := q.find("level=")
+	if idx < 0:
+		return
+	var n := int(q.substr(idx + 6))
+	if n >= 1 and n <= Game.LEVEL_SEQUENCE.size():
+		get_tree().change_scene_to_file.call_deferred(Game.LEVEL_SEQUENCE[n - 1]["scene"])
 
 
 func _process(_delta: float) -> void:
