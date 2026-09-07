@@ -108,6 +108,26 @@ func _process(_delta: float) -> bool:
 			if _failed:
 				print("TEST_FAIL: 梯子双向攀爬异常")
 				quit(1)
+				return true
+			# 进入用例4：玩家站在梯子侧边缘（中心偏出 21px，擦到检测区但没正对）
+			_stage = 4
+			_frames = 0
+			_player.queue_free()
+			_player = null
+			_spawn_player(Vector2(521, 139))
+			Input.action_press("move_up")
+		return false
+
+	# ---------- 用例 4：擦边不得攀爬（须正对梯子） ----------
+	if _stage == 4:
+		if _frames == 30:
+			var refused: bool = not _player._climbing and _player.position.y > 130.0
+			print("用例4 擦边拒绝攀爬(y=%.0f climbing=%s): %s" % [
+				_player.position.y, _player._climbing, "PASS" if refused else "FAIL"])
+			_failed = _failed or not refused
+			if _failed:
+				print("TEST_FAIL")
+				quit(1)
 			else:
 				print("== 全部通过 ==")
 				quit(0)

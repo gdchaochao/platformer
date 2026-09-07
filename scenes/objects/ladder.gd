@@ -6,7 +6,7 @@ extends Area2D
 
 @export var height: float = 120.0  # 梯子总长（px）
 
-const WIDTH := 30.0
+const WIDTH := 26.0  # 与主角碰撞宽(16px)相近，视觉上"人贴梯子"
 const COLOR_RAIL := Color(0.9, 0.76, 0.5, 1)
 const COLOR_RUNG := Color(0.72, 0.58, 0.36, 1)
 
@@ -56,6 +56,12 @@ func _ready() -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if not _bodies.has(body):
 		_bodies.append(body)
+
+
+## 玩家是否"正对"梯子：中心须落在梯杆宽度内。
+## 防止身体只擦到梯子边缘就浮空攀爬（爬边边）。
+func can_mount(body: Node2D) -> bool:
+	return absf(body.global_position.x - global_position.x) <= WIDTH / 2.0 - 2.0
 
 
 func _on_body_exited(body: Node2D) -> void:

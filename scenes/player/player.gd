@@ -42,16 +42,19 @@ func _physics_process(delta: float) -> void:
 		_down_block = false
 
 	var on_ladder: bool = _overlapping_ladder()
+	var mount_ladder: Node2D = _mountable_ladder()
 
-	# 进入攀爬：接触梯子 + 按上（持续）/按下（封锁时无效）
+	# 进入攀爬：接触梯子 + 正对梯子 + 按上（持续）/按下（封锁时无效）
 	# collision_mask 清零：攀爬中不与地形碰撞——站在梯子顶的平台上按↓
 	# 才能穿过平台面往下爬（否则会被平台托住永远下不来）
-	if not _climbing and on_ladder \
+	if not _climbing and mount_ladder \
 			and (Input.is_action_pressed("move_up")
 				or (Input.is_action_pressed("move_down") and not _down_block)):
 		_climbing = true
 		velocity = Vector2.ZERO
 		collision_mask = 0
+		# 吸附到梯子中心：瞬间最多挪十几个像素，杜绝"贴边浮空爬"
+		global_position.x = mount_ladder.global_position.x
 
 	if _climbing:
 		if not on_ladder:
@@ -60,15 +63,13 @@ func _physics_process(delta: float) -> void:
 		elif Input.is_action_just_pressed("jump_space"):
 			# 空格：跳离梯子
 			_exit_climb(false)
-			velocity = Vector2(velocity.x, jump_velocity * 0.7)
+			velocity = Vector2(dir * move_speed * 0.6, jump_velocity * 0.7)
 			Game.play_sfx("jump")
 		else:
-			# 攀爬移动：上/下爬，左右慢移（移出梯子即脱离）
+			# 攀爬移动：只上下爬（水平锁定，人贴在梯子上）
 			var vdir: float = Input.get_axis("move_up", "move_down")  # 上=-1 下=+1
-			velocity = Vector2(dir * move_speed * 0.5, vdir * climb_speed)
+			velocity = Vector2(0.0, vdir * climb_speed)
 			move_and_slide()
-			if dir != 0.0:
-				_flip(dir)
 			if is_on_floor() and vdir > 0.0:
 				_exit_climb(true)  # 爬到底落地
 			_on_ground_last = is_on_floor()
@@ -123,11 +124,24 @@ func _physics_process(delta: float) -> void:
 
 ## 是否与任意梯子（group "ladders"）重叠。
 ## 用梯子维护的进出列表查询（事件驱动），overlaps_body 在物理帧回调时机下不可靠。
+## 攀爬中保持判断用（此时玩家已被吸附到梯子中心）。
 func _overlapping_ladder() -> bool:
 	for lad in get_tree().get_nodes_in_group("ladders"):
 		if lad is Area2D and (lad as Area2D).has_method("has_body") and (lad as Area2D).has_body(self):
 			return true
 	return false
+
+
+## 是否存在可以攀爬的梯子：有重叠 + 玩家正对梯子中心（can_mount）。
+## 进入攀爬用；返回该梯子以便吸附对中。
+func _mountable_ladder() -> Node2D:
+	for lad in get_tree().get_nodes_in_group("ladders"):
+		if lad is Area2D and (lad as Area2D).has_method("has_body") \
+				and (lad as Area2D).has_method("can_mount"):
+			var l := lad as Area2D
+			if l.has_body(self) and l.can_mount(self):
+				return l
+	return null
 
 
 ## 脱离攀爬：恢复与地形的碰撞（所有攀爬出口必须走这里）。
