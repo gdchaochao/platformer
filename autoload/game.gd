@@ -15,6 +15,7 @@ const MAIN_MENU: String = "res://scenes/ui/main_menu.tscn"
 const LEVEL_SEQUENCE: Array[Dictionary] = [
 	{ "scene": "res://scenes/levels/level_1_1.tscn", "world": "forest", "display": "森林王国 1-1 苏醒之林" },
 	{ "scene": "res://scenes/levels/level_1_2.tscn", "world": "forest", "display": "森林王国 1-2 黄昏林地" },
+	{ "scene": "res://scenes/levels/level_1_3.tscn", "world": "forest", "display": "森林王国 1-3 暮色高塔" },
 ]
 
 var lives: int = 3
@@ -100,6 +101,9 @@ func _setup_input() -> void:
 	_add_action("move_left", [KEY_A, KEY_LEFT])
 	_add_action("move_right", [KEY_D, KEY_RIGHT])
 	_add_action("jump", [KEY_SPACE, KEY_W, KEY_UP])
+	_add_action("move_up", [KEY_W, KEY_UP])      # 梯子向上爬（攀爬状态中不触发跳跃）
+	_add_action("move_down", [KEY_S, KEY_DOWN])  # 梯子向下爬
+	_add_action("jump_space", [KEY_SPACE])       # 攀爬中按空格跳离梯子（与 W/↑ 区分）
 
 
 func _add_action(action: String, keys: Array) -> void:

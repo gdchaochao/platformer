@@ -1,8 +1,7 @@
 extends CharacterBody2D
 ## 玩家角色控制（森林王国主角：小蘑菇人）
-## 包含一套"手感良好"的基础平台跳跃参数：
-##   加速/摩擦、变量跳跃高度、跳跃缓冲(jump buffer)、土狼时间(coyote time)。
-## 这些参数都集中在顶部 @export，方便在编辑器里调试手感。
+## 手感参数集中在顶部 @export，方便在编辑器里调试。
+## 输入三重保险：InputMap 动作（逻辑+物理双绑）+ 物理/逻辑键轮询兜底。
 
 # ---------- 可调参数 ----------
 @export var move_speed: float = 220.0        # 最大水平速度 (px/s)
@@ -16,6 +15,7 @@ extends CharacterBody2D
 @export var jump_buffer_time: float = 0.12   # 落地前按跳跃的宽容时间
 @export var coyote_time: float = 0.10        # 离开平台后仍可起跳的宽容时间
 @export var hold_to_auto_jump: bool = true  # 按住跳跃键：落地瞬间自动再跳（连跳手感试验）
+@export var climb_speed: float = 120.0       # 梯子攀爬速度
 # --------------------------
 
 var _jump_buffer: float = 0.0
@@ -23,17 +23,11 @@ var _coyote: float = 0.0
 var _on_ground_last: bool = false
 var _jump_held_last: bool = false
 var invulnerable: bool = false   # 受伤无敌帧期间忽略再次伤害
-
-@onready var _cap: Polygon2D = $Cap
-@onready var _body: Polygon2D = $Body
-@onready var _eye_l: Polygon2D = $EyeL
-@onready var _eye_r: Polygon2D = $EyeR
+var _climbing: bool = false      # 正在爬梯子
 
 
 func _physics_process(delta: float) -> void:
-	# 输入三重保险（不同浏览器/事件字段填充方式下任一路径生效即可）：
-	# ① InputMap 动作（Game._setup_input 逻辑键+物理键双绑）
-	# ② 物理键轮询  ③ 逻辑键轮询
+	# 水平输入（动作优先，轮询兜底）
 	var dir: float = Input.get_axis("move_left", "move_right")
 	if dir == 0.0:
 		if _down(KEY_A) or _down(KEY_LEFT):
@@ -41,6 +35,36 @@ func _physics_process(delta: float) -> void:
 		elif _down(KEY_D) or _down(KEY_RIGHT):
 			dir = 1.0
 
+	# ---------- 梯子攀爬 ----------
+	var on_ladder: bool = _overlapping_ladder()
+
+	# 进入攀爬：接触梯子 + 按上/下
+	if not _climbing and on_ladder \
+			and (Input.is_action_pressed("move_up") or Input.is_action_pressed("move_down")):
+		_climbing = true
+		velocity = Vector2.ZERO
+
+	if _climbing:
+		if not on_ladder:
+			_climbing = false  # 爬出梯子顶端/侧面 → 恢复正常物理
+		elif Input.is_action_just_pressed("jump_space"):
+			# 空格：跳离梯子
+			_climbing = false
+			velocity = Vector2(velocity.x, jump_velocity * 0.7)
+			Game.play_sfx("jump")
+		else:
+			# 攀爬移动：上/下爬，左右慢移（移出梯子即脱离）
+			var vdir: float = Input.get_axis("move_up", "move_down")  # 上=-1 下=+1
+			velocity = Vector2(dir * move_speed * 0.5, vdir * climb_speed)
+			move_and_slide()
+			if dir != 0.0:
+				_flip(dir)
+			if is_on_floor() and vdir > 0.0:
+				_climbing = false  # 爬到底落地
+			_on_ground_last = is_on_floor()
+			return
+
+	# ---------- 常规移动 ----------
 	var jump_pressed: bool = Input.is_action_pressed("jump") \
 		or _down(KEY_SPACE) or _down(KEY_W) or _down(KEY_UP)
 
@@ -87,6 +111,15 @@ func _physics_process(delta: float) -> void:
 	_on_ground_last = is_on_floor()
 
 
+## 是否与任意梯子（group "ladders"）重叠。
+## 用梯子维护的进出列表查询（事件驱动），overlaps_body 在物理帧回调时机下不可靠。
+func _overlapping_ladder() -> bool:
+	for lad in get_tree().get_nodes_in_group("ladders"):
+		if lad is Area2D and (lad as Area2D).has_method("has_body") and (lad as Area2D).has_body(self):
+			return true
+	return false
+
+
 func _flip(dir: float) -> void:
 	if dir > 0.0 and scale.x < 0.0:
 		scale.x = 1.0
@@ -109,6 +142,7 @@ func take_hit() -> void:
 	if invulnerable:
 		return
 	invulnerable = true
+	_climbing = false
 	Game.play_sfx("hurt")
 	Game.hurt_player()
 	if not is_inside_tree():
@@ -119,10 +153,3 @@ func take_hit() -> void:
 		tw.tween_property(self, "modulate:a", 0.35, 0.14)
 		tw.tween_property(self, "modulate:a", 1.0, 0.14)
 	tw.tween_callback(func() -> void: invulnerable = false)
-
-
-## 受伤闪烁（占位：之后可换真正的受伤动画/无敌帧）
-func take_hit_feedback() -> void:
-	modulate = Color(1, 0.5, 0.5)
-	await get_tree().create_timer(0.15).timeout
-	modulate = Color.WHITE
