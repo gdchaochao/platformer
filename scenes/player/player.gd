@@ -22,6 +22,7 @@ var _jump_buffer: float = 0.0
 var _coyote: float = 0.0
 var _on_ground_last: bool = false
 var _jump_held_last: bool = false
+var _down_block: bool = false    # 下爬落地脱梯后封锁↓，松开↓才解除（防无限下穿）
 var invulnerable: bool = false   # 受伤无敌帧期间忽略再次伤害
 var _climbing: bool = false      # 正在爬梯子
 
@@ -36,20 +37,29 @@ func _physics_process(delta: float) -> void:
 			dir = 1.0
 
 	# ---------- 梯子攀爬 ----------
+	# ↓松开即解除封锁
+	if not Input.is_action_pressed("move_down"):
+		_down_block = false
+
 	var on_ladder: bool = _overlapping_ladder()
 
-	# 进入攀爬：接触梯子 + 按上/下
+	# 进入攀爬：接触梯子 + 按上（持续）/按下（封锁时无效）
+	# collision_mask 清零：攀爬中不与地形碰撞——站在梯子顶的平台上按↓
+	# 才能穿过平台面往下爬（否则会被平台托住永远下不来）
 	if not _climbing and on_ladder \
-			and (Input.is_action_pressed("move_up") or Input.is_action_pressed("move_down")):
+			and (Input.is_action_pressed("move_up")
+				or (Input.is_action_pressed("move_down") and not _down_block)):
 		_climbing = true
 		velocity = Vector2.ZERO
+		collision_mask = 0
 
 	if _climbing:
 		if not on_ladder:
-			_climbing = false  # 爬出梯子顶端/侧面 → 恢复正常物理
+			# 爬出梯子顶端/底端：向下爬出 → 封锁↓（落地后按住不放不会反复下穿）
+			_exit_climb(velocity.y > 0.0)
 		elif Input.is_action_just_pressed("jump_space"):
 			# 空格：跳离梯子
-			_climbing = false
+			_exit_climb(false)
 			velocity = Vector2(velocity.x, jump_velocity * 0.7)
 			Game.play_sfx("jump")
 		else:
@@ -60,7 +70,7 @@ func _physics_process(delta: float) -> void:
 			if dir != 0.0:
 				_flip(dir)
 			if is_on_floor() and vdir > 0.0:
-				_climbing = false  # 爬到底落地
+				_exit_climb(true)  # 爬到底落地
 			_on_ground_last = is_on_floor()
 			return
 
@@ -120,6 +130,15 @@ func _overlapping_ladder() -> bool:
 	return false
 
 
+## 脱离攀爬：恢复与地形的碰撞（所有攀爬出口必须走这里）。
+## block_down=true 时封锁↓键直到松开（用于下爬落地场景，防按住↓反复下穿地图）。
+func _exit_climb(block_down: bool = false) -> void:
+	_climbing = false
+	collision_mask = 1
+	if block_down:
+		_down_block = true
+
+
 func _flip(dir: float) -> void:
 	if dir > 0.0 and scale.x < 0.0:
 		scale.x = 1.0
@@ -142,7 +161,8 @@ func take_hit() -> void:
 	if invulnerable:
 		return
 	invulnerable = true
-	_climbing = false
+	if _climbing:
+		_exit_climb(false)
 	Game.play_sfx("hurt")
 	Game.hurt_player()
 	if not is_inside_tree():
