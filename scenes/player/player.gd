@@ -15,6 +15,7 @@ extends CharacterBody2D
 @export var gravity_scale_release: float = 1.8  # 松开跳跃键的重力倍率（快速落下=可调跳跃高度）
 @export var jump_buffer_time: float = 0.12   # 落地前按跳跃的宽容时间
 @export var coyote_time: float = 0.10        # 离开平台后仍可起跳的宽容时间
+@export var hold_to_auto_jump: bool = true  # 按住跳跃键：落地瞬间自动再跳（连跳手感试验）
 # --------------------------
 
 var _jump_buffer: float = 0.0
@@ -66,7 +67,9 @@ func _physics_process(delta: float) -> void:
 	velocity.y += gravity * g_mult * delta
 
 	# --- 起跳 ---
-	if _jump_buffer > 0.0 and _coyote > 0.0:
+	# 边沿触发（buffer + coyote） 或 按住连跳（落地即自动再跳）
+	var can_jump: bool = _coyote > 0.0 and (_jump_buffer > 0.0 or (hold_to_auto_jump and jump_pressed))
+	if can_jump:
 		velocity.y = jump_velocity
 		_jump_buffer = 0.0
 		_coyote = 0.0
