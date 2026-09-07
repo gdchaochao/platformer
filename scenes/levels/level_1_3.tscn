@@ -224,11 +224,11 @@ polygon = PackedVector2Array(2, 215, 40, 232, 2, 248)
 
 [node name="Ladder1" parent="." instance=ExtResource("5_ladder")]
 position = Vector2(560, 135)
-height = 190.0
+height = 185.0
 
 [node name="Ladder2" parent="." instance=ExtResource("5_ladder")]
 position = Vector2(1330, 47)
-height = 281.0
+height = 273.0
 
 [node name="BouncePad1" parent="." instance=ExtResource("6_pad")]
 position = Vector2(1450, 300)

@@ -25,6 +25,7 @@ var _jump_held_last: bool = false
 var _down_block: bool = false    # 下爬落地脱梯后封锁↓，松开↓才解除（防无限下穿）
 var invulnerable: bool = false   # 受伤无敌帧期间忽略再次伤害
 var _climbing: bool = false      # 正在爬梯子
+var _active_ladder: Node2D = null  # 当前攀爬的梯子（下爬底端判定用）
 
 
 func _physics_process(delta: float) -> void:
@@ -51,6 +52,7 @@ func _physics_process(delta: float) -> void:
 			and (Input.is_action_pressed("move_up")
 				or (Input.is_action_pressed("move_down") and not _down_block)):
 		_climbing = true
+		_active_ladder = mount_ladder
 		velocity = Vector2.ZERO
 		collision_mask = 0
 		# 吸附到梯子中心：瞬间最多挪十几个像素，杜绝"贴边浮空爬"
@@ -69,6 +71,21 @@ func _physics_process(delta: float) -> void:
 			# 攀爬移动：只上下爬（水平锁定，人贴在梯子上）
 			var vdir: float = Input.get_axis("move_up", "move_down")  # 上=-1 下=+1
 			velocity = Vector2(0.0, vdir * climb_speed)
+
+			# 下爬到底端：脚一碰到梯子底端立即对齐落地退出。
+			# 不能越过底端再退攀——攀爬中碰撞是关闭的，越过底端时
+			# 玩家已经嵌进地面矩形里，恢复碰撞会被物理挤出去，
+			# 表现就是"往下突破地面掉一下"。
+			if vdir > 0.0 and is_instance_valid(_active_ladder):
+				var bottom_y: float = _active_ladder.global_position.y + float(_active_ladder.height)
+				if global_position.y + 12.0 >= bottom_y - 1.0:
+					global_position.y = bottom_y - 12.0  # 脚对齐梯子底端
+					velocity = Vector2.ZERO
+					_exit_climb(true)
+					move_and_slide()  # 恢复碰撞后贴地（轻微嵌入会被平滑推到地表）
+					_on_ground_last = is_on_floor()
+					return
+
 			move_and_slide()
 			if is_on_floor() and vdir > 0.0:
 				_exit_climb(true)  # 爬到底落地
@@ -148,6 +165,7 @@ func _mountable_ladder() -> Node2D:
 ## block_down=true 时封锁↓键直到松开（用于下爬落地场景，防按住↓反复下穿地图）。
 func _exit_climb(block_down: bool = false) -> void:
 	_climbing = false
+	_active_ladder = null
 	collision_mask = 1
 	if block_down:
 		_down_block = true
