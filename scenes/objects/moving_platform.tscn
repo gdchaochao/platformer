@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/objects/moving_platform.gd" id="1_mp"]
+
+[sub_resource type="RectangleShape2D" id="Sh_mp"]
+size = Vector2(130, 16)
+
+[node name="MovingPlatform" type="AnimatableBody2D"]
+script = ExtResource("1_mp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("Sh_mp")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.52, 0.58, 0.52, 1)
+polygon = PackedVector2Array(-65, -8, 65, -8, 65, 8, -65, 8)
+
+[node name="TopEdge" type="Polygon2D" parent="."]
+color = Color(0.68, 0.74, 0.66, 1)
+polygon = PackedVector2Array(-65, -8, 65, -8, 65, -3, -65, -3)
+
+[node name="RuneL" type="Polygon2D" parent="."]
+color = Color(0.38, 0.46, 0.4, 1)
+polygon = PackedVector2Array(-40, -2, -30, -2, -30, 4, -40, 4)
+
+[node name="RuneR" type="Polygon2D" parent="."]
+color = Color(0.38, 0.46, 0.4, 1)
+polygon = PackedVector2Array(30, -2, 40, -2, 40, 4, 30, 4)

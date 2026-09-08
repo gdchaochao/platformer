@@ -3,6 +3,7 @@ extends Node
 ## 职责：跨场景的生命/金币计数、关卡顺序表、输入动作注册、场景切换。
 
 signal coins_changed(value: int)
+signal gems_changed(value: int)
 signal lives_changed(value: int)
 signal player_hurt   # 玩家受伤但生命未耗尽：关卡负责把玩家传送回出生点
 signal game_over     # 生命耗尽：关卡负责显示 Game Over 画面
@@ -20,10 +21,12 @@ const LEVEL_SEQUENCE: Array[Dictionary] = [
 	{ "scene": "res://scenes/levels/level_1_1.tscn", "world": "forest", "display": "森林王国 1-1 苏醒之林" },
 	{ "scene": "res://scenes/levels/level_1_2.tscn", "world": "forest", "display": "森林王国 1-2 黄昏林地" },
 	{ "scene": "res://scenes/levels/level_1_3.tscn", "world": "forest", "display": "森林王国 1-3 暮色高塔" },
+	{ "scene": "res://scenes/levels/level_1_4.tscn", "world": "forest", "display": "森林王国 1-4 浮空石林" },
 ]
 
 var lives: int = 3
 var coins: int = 0
+var gems: int = 0   # 大宝石（每关稀有收集品）
 var is_game_over: bool = false
 
 # ---------- 音频 ----------
@@ -36,6 +39,8 @@ const SFX_PATHS: Dictionary = {
 	"win": "res://assets/audio/sfx/win.wav",
 	"game_over": "res://assets/audio/sfx/game_over.wav",
 	"click": "res://assets/audio/sfx/click.wav",
+	"gem": "res://assets/audio/sfx/gem.wav",
+	"checkpoint": "res://assets/audio/sfx/checkpoint.wav",
 }
 const MUSIC_PATHS: Dictionary = {
 	"menu": "res://assets/audio/music/menu_theme.wav",
@@ -130,7 +135,9 @@ func reset_run() -> void:
 	is_game_over = false
 	lives = 3
 	coins = 0
+	gems = 0
 	coins_changed.emit(coins)
+	gems_changed.emit(gems)
 	lives_changed.emit(lives)
 
 
@@ -138,6 +145,12 @@ func reset_run() -> void:
 func add_coin(amount: int = 1) -> void:
 	coins += amount
 	coins_changed.emit(coins)
+
+
+## 拾取大宝石
+func add_gem(amount: int = 1) -> void:
+	gems += amount
+	gems_changed.emit(gems)
 
 
 ## 受到一次伤害：扣一条命。

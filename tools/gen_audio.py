@@ -140,6 +140,18 @@ def gen_sfx() -> None:
     t.add(0.52, tone((1047, 1047), 0.35, square, 0.4, vib=0.01), 0.8)
     t.write(os.path.join(d, "win.wav"))
 
+    # 大宝石：明亮上行双琶音（比金币更高更亮，突出稀有感）
+    t = Track(0.32)
+    t.add(0.0, seq([1568, 2093], 0.08, square, 0.3, release=0.07), 0.85)
+    t.add(0.04, seq([2093, 2637], 0.11, square, 0.3, release=0.1), 0.5)
+    t.write(os.path.join(d, "gem.wav"))
+
+    # 检查点激活：温暖上行双音（安全感）
+    t = Track(0.34)
+    t.add(0.0, seq([660, 880], 0.08, square, 0.4, release=0.06), 0.8)
+    t.add(0.09, seq([880, 1175], 0.13, square, 0.4, release=0.1), 0.7)
+    t.write(os.path.join(d, "checkpoint.wav"))
+
     t = Track(1.15)
     g = seq([392, 330, 262], 0.24, square, 0.5, release=0.18)
     t.add(0.0, g, 0.8)

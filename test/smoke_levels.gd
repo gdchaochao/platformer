@@ -6,9 +6,10 @@ const SCENES := [
 	"res://scenes/levels/level_1_1.tscn",
 	"res://scenes/levels/level_1_2.tscn",
 	"res://scenes/levels/level_1_3.tscn",
+	"res://scenes/levels/level_1_4.tscn",
 	"res://scenes/ui/main_menu.tscn",
 ]
-const NAMES := ["1-1", "1-2", "1-3", "主菜单"]
+const NAMES := ["1-1", "1-2", "1-3", "1-4", "主菜单"]
 
 var _step := -1
 var _frames := 0

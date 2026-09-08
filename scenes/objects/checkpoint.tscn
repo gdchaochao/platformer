@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/objects/checkpoint.gd" id="1_cp"]
+
+[sub_resource type="RectangleShape2D" id="Sh_cp"]
+size = Vector2(44, 100)
+
+[node name="Checkpoint" type="Area2D" groups=["checkpoints"]]
+script = ExtResource("1_cp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -50)
+shape = SubResource("Sh_cp")
+
+[node name="Pole" type="Polygon2D" parent="."]
+color = Color(0.42, 0.44, 0.4, 1)
+polygon = PackedVector2Array(-4, 0, 4, 0, 4, -88, -4, -88)
+
+[node name="Flag" type="Polygon2D" parent="."]
+color = Color(0.5, 0.52, 0.48, 1)
+polygon = PackedVector2Array(2, -86, 34, -74, 2, -62)
+
+[node name="Base" type="Polygon2D" parent="."]
+color = Color(0.36, 0.38, 0.35, 1)
+polygon = PackedVector2Array(-12, 0, 12, 0, 10, 5, -10, 5)
