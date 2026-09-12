@@ -7,6 +7,7 @@ signal gems_changed(value: int)
 signal lives_changed(value: int)
 signal player_hurt   # 玩家受伤但生命未耗尽：关卡负责把玩家传送回出生点
 signal game_over     # 生命耗尽：关卡负责显示 Game Over 画面
+signal ability_granted(ability: String)  # 获得新能力（祭坛演出用）
 
 const START_LEVEL: String = "res://scenes/levels/level_1_1.tscn"
 const MAIN_MENU: String = "res://scenes/ui/main_menu.tscn"
@@ -23,8 +24,9 @@ const LEVEL_SEQUENCE: Array[Dictionary] = [
 	{ "scene": "res://scenes/levels/level_1_2.tscn", "world": "forest", "display": "森林王国 1-2 黄昏林地" },
 	{ "scene": "res://scenes/levels/level_1_3.tscn", "world": "forest", "display": "森林王国 1-3 暮色高塔" },
 	{ "scene": "res://scenes/levels/level_1_4.tscn", "world": "forest", "display": "森林王国 1-4 浮空石林" },
-	{ "scene": "res://scenes/levels/level_1_5.tscn", "world": "forest", "display": "森林王国 1-5 萤光林间" },
-	{ "scene": "res://scenes/levels/level_1_6.tscn", "world": "forest", "display": "森林王国 1-6 蛙鸣苔谷" },
+	{ "scene": "res://scenes/levels/level_1_5.tscn", "world": "forest", "display": "森林王国 1-5 萤光林间", "grants": ["double_jump"] },
+	{ "scene": "res://scenes/levels/level_1_6.tscn", "world": "forest", "display": "森林王国 1-6 蛙鸣苔谷", "grants": ["double_jump"] },
+	{ "scene": "res://scenes/levels/level_1_7.tscn", "world": "forest", "display": "森林王国 1-7 云端回廊", "grants": ["double_jump"] },
 ]
 
 var lives: int = 3
@@ -32,6 +34,11 @@ var coins: int = 0
 var gems: int = 0   # 大宝石（每关稀有收集品）
 var is_game_over: bool = false
 var run_elapsed_ms: int = 0   # 本轮用时（结算页展示；reset_run 清零）
+
+# 能力解锁状态（跟随关卡进度：进关时按顺序表自动补齐，跳关不软锁）
+var abilities: Dictionary = {
+	"double_jump": false,   # 二段跳：空中可再跳一次
+}
 
 # ---------- 音频 ----------
 const SFX_PATHS: Dictionary = {
@@ -45,6 +52,7 @@ const SFX_PATHS: Dictionary = {
 	"click": "res://assets/audio/sfx/click.wav",
 	"gem": "res://assets/audio/sfx/gem.wav",
 	"checkpoint": "res://assets/audio/sfx/checkpoint.wav",
+	"powerup": "res://assets/audio/sfx/powerup.wav",
 }
 const MUSIC_PATHS: Dictionary = {
 	"menu": "res://assets/audio/music/menu_theme.wav",
@@ -81,7 +89,7 @@ func _setup_audio() -> void:
 
 
 ## 播放音效（池满时静默丢弃，避免卡顿）
-func play_sfx(sfx_name: String, volume_db: float = -6.0) -> void:
+func play_sfx(sfx_name: String, volume_db: float = -6.0, pitch: float = 1.0) -> void:
 	var path: String = SFX_PATHS.get(sfx_name, "")
 	if path == "":
 		push_warning("未知音效: %s" % sfx_name)
@@ -90,6 +98,7 @@ func play_sfx(sfx_name: String, volume_db: float = -6.0) -> void:
 		if not p.playing:
 			p.stream = load(path)
 			p.volume_db = volume_db
+			p.pitch_scale = pitch
 			p.play()
 			return
 
@@ -206,6 +215,31 @@ func format_time(ms: int) -> String:
 func display_name(scene_path: String) -> String:
 	var idx: int = _index_of(scene_path)
 	return str(LEVEL_SEQUENCE[idx]["display"]) if idx >= 0 else ""
+
+
+# ---------- 能力系统 ----------
+## 拥有某能力？
+func has_ability(ability: String) -> bool:
+	return abilities.get(ability, false)
+
+
+## 授予能力（幂等：已拥有时不重复发信号）
+func grant_ability(ability: String) -> void:
+	if abilities.get(ability, false):
+		return
+	abilities[ability] = true
+	ability_granted.emit(ability)
+
+
+## 进入关卡时按顺序表补齐能力：
+## 顺序玩法下与"祭坛拾取"等价；用关卡选择跳关时自动补上，永不软锁。
+func apply_grants_for_level(scene_path: String) -> void:
+	var idx: int = _index_of(scene_path)
+	if idx < 0:
+		return
+	for i in idx + 1:
+		for a in LEVEL_SEQUENCE[i].get("grants", []):
+			grant_ability(str(a))
 
 
 func reload_current_level() -> void:

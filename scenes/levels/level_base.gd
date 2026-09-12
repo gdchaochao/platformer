@@ -33,6 +33,8 @@ func _ready() -> void:
 	Game.play_music("level")
 	_focus_canvas_web()
 	_apply_camera_limits()
+	# 按顺序表补齐本关及之前的能力（跳关不软锁）
+	Game.apply_grants_for_level(scene_file_path)
 
 	_win_label.visible = false
 	_win_label.text = ""
@@ -71,6 +73,8 @@ func _ready() -> void:
 		goal.body_entered.connect(_on_goal_body_entered)
 	for hazard: Area2D in get_tree().get_nodes_in_group("hazard"):
 		hazard.body_entered.connect(_on_hazard_body_entered)
+	for shrine: Area2D in get_tree().get_nodes_in_group("shrines"):
+		shrine.body_entered.connect(_on_shrine_body_entered.bind(shrine))
 
 	_refresh_hud()
 
@@ -160,6 +164,38 @@ func _on_killzone_body_entered(body: Node2D) -> void:
 func _on_hazard_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player") and not _won and body.has_method("take_hit"):
 		body.take_hit()
+
+
+## 能力祭坛：首次触碰 → 授予能力 + 音效 + 大字演出；已拥有 → 祭坛自熄
+func _on_shrine_body_entered(body: Node2D, shrine: Area2D) -> void:
+	if not body.is_in_group("player") or _won:
+		return
+	if not shrine.has_method("ability_name"):
+		return
+	var ability: String = shrine.ability_name()
+	var first_time: bool = not Game.has_ability(ability)
+	Game.grant_ability(ability)
+	shrine.collect()
+	if first_time:
+		Game.play_sfx("powerup")
+		_show_ability_toast(ability)
+
+
+## 能力获得大字提示（AbilityLabel 存在才显示；存档/老关卡可缺省）
+func _show_ability_toast(ability: String) -> void:
+	var label: Label = get_node_or_null("HUD/AbilityLabel")
+	if label == null:
+		return
+	var display: String = {
+		"double_jump": "二段跳",
+	}.get(ability, ability)
+	label.text = "获得能力：%s！（空中再按一次跳跃）" % display
+	label.visible = true
+	label.modulate.a = 1.0
+	var tw := create_tween()
+	tw.tween_interval(2.4)
+	tw.tween_property(label, "modulate:a", 0.0, 0.6)
+	tw.tween_callback(func() -> void: label.visible = false)
 
 
 func _on_goal_body_entered(body: Node2D) -> void:

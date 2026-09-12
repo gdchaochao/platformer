@@ -3,259 +3,202 @@
 [ext_resource type="Script" path="res://scenes/levels/level_base.gd" id="1_lvl"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="FontFile" path="res://assets/fonts/fusion_pixel.otf" id="3_font"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/walker.tscn" id="4_walker"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/hopper.tscn" id="4_hopper"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/flyer.tscn" id="5_flyer"]
 [ext_resource type="PackedScene" path="res://scenes/objects/checkpoint.tscn" id="7_cp"]
 [ext_resource type="PackedScene" path="res://scenes/objects/gem.tscn" id="8_gem"]
-[ext_resource type="PackedScene" path="res://scenes/objects/ability_shrine.tscn" id="9_shrine"]
 
 [sub_resource type="RectangleShape2D" id="Sh_g1"]
-size = Vector2(900, 60)
+size = Vector2(700, 60)
 [sub_resource type="RectangleShape2D" id="Sh_g2"]
-size = Vector2(500, 60)
+size = Vector2(340, 60)
 [sub_resource type="RectangleShape2D" id="Sh_g3"]
-size = Vector2(500, 60)
-[sub_resource type="RectangleShape2D" id="Sh_p1"]
-size = Vector2(150, 18)
-[sub_resource type="RectangleShape2D" id="Sh_p2"]
-size = Vector2(140, 18)
-[sub_resource type="RectangleShape2D" id="Sh_p3"]
-size = Vector2(140, 18)
+size = Vector2(340, 60)
+[sub_resource type="RectangleShape2D" id="Sh_g4"]
+size = Vector2(400, 60)
+[sub_resource type="RectangleShape2D" id="Sh_pa"]
+size = Vector2(130, 18)
 [sub_resource type="RectangleShape2D" id="Sh_kill"]
-size = Vector2(3400, 80)
+size = Vector2(3600, 80)
 [sub_resource type="RectangleShape2D" id="Sh_goal"]
 size = Vector2(44, 130)
 [sub_resource type="CircleShape2D" id="Sh_coin"]
 radius = 14.0
 [sub_resource type="RectangleShape2D" id="Sh_sp1"]
 size = Vector2(100, 14)
-[sub_resource type="RectangleShape2D" id="Sh_sp2"]
-size = Vector2(100, 14)
 
-[node name="Level_1_5" type="Node2D"]
+[node name="Level_1_7" type="Node2D"]
 script = ExtResource("1_lvl")
-sky_color = Color(0.12, 0.13, 0.26, 1)
-camera_limit_right = 2400.0
+sky_color = Color(0.62, 0.75, 0.92, 1)
+camera_limit_right = 2650.0
 
 [node name="Background" type="Node2D" parent="."]
-[node name="TreeA" type="Node2D" parent="Background"]
-position = Vector2(200, 320)
-[node name="Trunk" type="Polygon2D" parent="Background/TreeA"]
-color = Color(0.2, 0.18, 0.3, 1)
-polygon = PackedVector2Array(-5, -54, 5, -54, 7, 2, -7, 2)
-[node name="Foliage" type="Polygon2D" parent="Background/TreeA"]
-color = Color(0.16, 0.3, 0.28, 1)
-polygon = PackedVector2Array(0, -104, 27, -84, 24, -52, 0, -38, -24, -52, -27, -84)
-[node name="TreeB" type="Node2D" parent="Background"]
-position = Vector2(1500, 320)
-[node name="Trunk" type="Polygon2D" parent="Background/TreeB"]
-color = Color(0.2, 0.18, 0.3, 1)
-polygon = PackedVector2Array(-5, -54, 5, -54, 7, 2, -7, 2)
-[node name="Foliage" type="Polygon2D" parent="Background/TreeB"]
-color = Color(0.16, 0.3, 0.28, 1)
-polygon = PackedVector2Array(0, -104, 27, -84, 24, -52, 0, -38, -24, -52, -27, -84)
-[node name="TreeC" type="Node2D" parent="Background"]
-position = Vector2(2100, 320)
-[node name="Trunk" type="Polygon2D" parent="Background/TreeC"]
-color = Color(0.2, 0.18, 0.3, 1)
-polygon = PackedVector2Array(-5, -54, 5, -54, 7, 2, -7, 2)
-[node name="Foliage" type="Polygon2D" parent="Background/TreeC"]
-color = Color(0.18, 0.32, 0.3, 1)
-polygon = PackedVector2Array(0, -104, 27, -84, 24, -52, 0, -38, -24, -52, -27, -84)
-[node name="Firefly1" type="Polygon2D" parent="Background"]
-color = Color(1, 0.95, 0.55, 0.9)
-polygon = PackedVector2Array(0, -3, 3, 0, 0, 3, -3, 0)
-position = Vector2(300, 180)
-[node name="Firefly2" type="Polygon2D" parent="Background"]
-color = Color(1, 0.95, 0.55, 0.8)
-polygon = PackedVector2Array(0, -3, 3, 0, 0, 3, -3, 0)
-position = Vector2(700, 140)
-[node name="Firefly3" type="Polygon2D" parent="Background"]
-color = Color(1, 0.95, 0.55, 0.85)
-polygon = PackedVector2Array(0, -3, 3, 0, 0, 3, -3, 0)
-position = Vector2(1600, 220)
-[node name="Firefly4" type="Polygon2D" parent="Background"]
-color = Color(1, 0.95, 0.55, 0.75)
-polygon = PackedVector2Array(0, -3, 3, 0, 0, 3, -3, 0)
-position = Vector2(2000, 120)
-[node name="Firefly5" type="Polygon2D" parent="Background"]
-color = Color(1, 0.95, 0.55, 0.8)
-polygon = PackedVector2Array(0, -3, 3, 0, 0, 3, -3, 0)
-position = Vector2(1100, 200)
+[node name="CloudA" type="Polygon2D" parent="Background"]
+color = Color(1, 1, 1, 0.8)
+polygon = PackedVector2Array(0, -12, 14, -22, 34, -24, 50, -16, 54, -4, 40, 2, 10, 2, -4, -2)
+position = Vector2(300, 120)
+[node name="CloudB" type="Polygon2D" parent="Background"]
+color = Color(1, 1, 1, 0.7)
+polygon = PackedVector2Array(0, -12, 14, -22, 34, -24, 50, -16, 54, -4, 40, 2, 10, 2, -4, -2)
+position = Vector2(1300, 90)
+[node name="CloudC" type="Polygon2D" parent="Background"]
+color = Color(1, 1, 1, 0.75)
+polygon = PackedVector2Array(0, -12, 14, -22, 34, -24, 50, -16, 54, -4, 40, 2, 10, 2, -4, -2)
+position = Vector2(2100, 130)
+
+[node name="SignBoard" type="Polygon2D" parent="."]
+color = Color(0.55, 0.4, 0.26, 1)
+polygon = PackedVector2Array(-70, -26, 70, -26, 70, 6, -70, 6)
+position = Vector2(420, 270)
+[node name="SignPost" type="Polygon2D" parent="."]
+color = Color(0.45, 0.33, 0.22, 1)
+polygon = PackedVector2Array(-4, 6, 4, 6, 4, 50, -4, 50)
+position = Vector2(420, 270)
+[node name="SignText" type="Label" parent="."]
+offset_left = 352.0
+offset_top = 246.0
+offset_right = 492.0
+offset_bottom = 268.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(1, 0.97, 0.85, 1)
+theme_override_font_sizes/font_size = 13
+text = "空中再按一次跳跃！"
+horizontal_alignment = 1
 
 [node name="Ground1" type="StaticBody2D" parent="."]
-position = Vector2(350, 350)
+position = Vector2(200, 350)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ground1"]
 shape = SubResource("Sh_g1")
 [node name="Visual" type="Polygon2D" parent="Ground1"]
-color = Color(0.22, 0.35, 0.24, 1)
-polygon = PackedVector2Array(-450, -30, 450, -30, 450, 30, -450, 30)
+color = Color(0.5, 0.58, 0.4, 1)
+polygon = PackedVector2Array(-350, -30, 350, -30, 350, 30, -350, 30)
 
 [node name="Ground2" type="StaticBody2D" parent="."]
-position = Vector2(1150, 350)
+position = Vector2(1000, 350)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ground2"]
 shape = SubResource("Sh_g2")
 [node name="Visual" type="Polygon2D" parent="Ground2"]
-color = Color(0.22, 0.35, 0.24, 1)
-polygon = PackedVector2Array(-250, -30, 250, -30, 250, 30, -250, 30)
+color = Color(0.5, 0.58, 0.4, 1)
+polygon = PackedVector2Array(-170, -30, 170, -30, 170, 30, -170, 30)
 
 [node name="Ground3" type="StaticBody2D" parent="."]
-position = Vector2(1900, 350)
+position = Vector2(1630, 350)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ground3"]
 shape = SubResource("Sh_g3")
 [node name="Visual" type="Polygon2D" parent="Ground3"]
-color = Color(0.22, 0.35, 0.24, 1)
-polygon = PackedVector2Array(-250, -30, 250, -30, 250, 30, -250, 30)
+color = Color(0.5, 0.58, 0.4, 1)
+polygon = PackedVector2Array(-170, -30, 170, -30, 170, 30, -170, 30)
 
-[node name="P1" type="StaticBody2D" parent="."]
-position = Vector2(500, 210)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="P1"]
-shape = SubResource("Sh_p1")
-[node name="Visual" type="Polygon2D" parent="P1"]
-color = Color(0.3, 0.28, 0.45, 1)
-polygon = PackedVector2Array(-75, -9, 75, -9, 75, 9, -75, 9)
+[node name="Ground4" type="StaticBody2D" parent="."]
+position = Vector2(2380, 350)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground4"]
+shape = SubResource("Sh_g4")
+[node name="Visual" type="Polygon2D" parent="Ground4"]
+color = Color(0.5, 0.58, 0.4, 1)
+polygon = PackedVector2Array(-200, -30, 200, -30, 200, 30, -200, 30)
 
-[node name="P2" type="StaticBody2D" parent="."]
-position = Vector2(1250, 200)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="P2"]
-shape = SubResource("Sh_p2")
-[node name="Visual" type="Polygon2D" parent="P2"]
-color = Color(0.3, 0.28, 0.45, 1)
-polygon = PackedVector2Array(-70, -9, 70, -9, 70, 9, -70, 9)
-
-[node name="P3" type="StaticBody2D" parent="."]
-position = Vector2(1500, 140)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="P3"]
-shape = SubResource("Sh_p3")
-[node name="Visual" type="Polygon2D" parent="P3"]
-color = Color(0.3, 0.28, 0.45, 1)
-polygon = PackedVector2Array(-70, -9, 70, -9, 70, 9, -70, 9)
+[node name="P_A" type="StaticBody2D" parent="."]
+position = Vector2(1000, 130)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="P_A"]
+shape = SubResource("Sh_pa")
+[node name="Visual" type="Polygon2D" parent="P_A"]
+color = Color(0.55, 0.5, 0.62, 1)
+polygon = PackedVector2Array(-65, -9, 65, -9, 65, 9, -65, 9)
 
 [node name="Spikes1" type="Area2D" parent="." groups=["hazard"]]
-position = Vector2(1050, 0)
+position = Vector2(2330, 0)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Spikes1"]
 position = Vector2(0, 313)
 shape = SubResource("Sh_sp1")
 [node name="Visual" type="Polygon2D" parent="Spikes1"]
-color = Color(0.6, 0.62, 0.72, 1)
-polygon = PackedVector2Array(-50, 320, -37.5, 304, -25, 320, -12.5, 304, 0, 320, 12.5, 304, 25, 320, 37.5, 304, 50, 320)
-
-[node name="Spikes2" type="Area2D" parent="." groups=["hazard"]]
-position = Vector2(1800, 0)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Spikes2"]
-position = Vector2(0, 313)
-shape = SubResource("Sh_sp2")
-[node name="Visual" type="Polygon2D" parent="Spikes2"]
-color = Color(0.6, 0.62, 0.72, 1)
+color = Color(0.62, 0.66, 0.6, 1)
 polygon = PackedVector2Array(-50, 320, -37.5, 304, -25, 320, -12.5, 304, 0, 320, 12.5, 304, 25, 320, 37.5, 304, 50, 320)
 
 [node name="KillZone" type="Area2D" parent="." groups=["killzone"]]
-position = Vector2(1000, 470)
+position = Vector2(1300, 470)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="KillZone"]
 shape = SubResource("Sh_kill")
 
 [node name="Coin1" type="Area2D" parent="." groups=["coins"]]
-position = Vector2(150, 290)
+position = Vector2(300, 290)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Coin1"]
 shape = SubResource("Sh_coin")
 [node name="Visual" type="Polygon2D" parent="Coin1"]
 color = Color(0.95, 0.82, 0.35, 1)
 polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
 [node name="Coin2" type="Area2D" parent="." groups=["coins"]]
-position = Vector2(450, 265)
+position = Vector2(690, 235)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Coin2"]
 shape = SubResource("Sh_coin")
 [node name="Visual" type="Polygon2D" parent="Coin2"]
 color = Color(0.95, 0.82, 0.35, 1)
 polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
 [node name="Coin3" type="Area2D" parent="." groups=["coins"]]
-position = Vector2(1050, 245)
+position = Vector2(1000, 90)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Coin3"]
 shape = SubResource("Sh_coin")
 [node name="Visual" type="Polygon2D" parent="Coin3"]
 color = Color(0.95, 0.82, 0.35, 1)
 polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
 [node name="Coin4" type="Area2D" parent="." groups=["coins"]]
-position = Vector2(1300, 165)
+position = Vector2(1315, 235)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Coin4"]
 shape = SubResource("Sh_coin")
 [node name="Visual" type="Polygon2D" parent="Coin4"]
 color = Color(0.95, 0.82, 0.35, 1)
 polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
 [node name="Coin5" type="Area2D" parent="." groups=["coins"]]
-position = Vector2(1550, 105)
+position = Vector2(1945, 235)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Coin5"]
 shape = SubResource("Sh_coin")
 [node name="Visual" type="Polygon2D" parent="Coin5"]
 color = Color(0.95, 0.82, 0.35, 1)
 polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
 [node name="Coin6" type="Area2D" parent="." groups=["coins"]]
-position = Vector2(1980, 240)
+position = Vector2(2450, 290)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Coin6"]
 shape = SubResource("Sh_coin")
 [node name="Visual" type="Polygon2D" parent="Coin6"]
 color = Color(0.95, 0.82, 0.35, 1)
 polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
-[node name="Coin7" type="Area2D" parent="." groups=["coins"]]
-position = Vector2(2100, 290)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Coin7"]
-shape = SubResource("Sh_coin")
-[node name="Visual" type="Polygon2D" parent="Coin7"]
-color = Color(0.95, 0.82, 0.35, 1)
-polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
 
 [node name="Goal" type="Area2D" parent="." groups=["goal"]]
-position = Vector2(2050, 0)
+position = Vector2(2510, 0)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Goal"]
 position = Vector2(0, 275)
 shape = SubResource("Sh_goal")
 [node name="Pole" type="Polygon2D" parent="Goal"]
-color = Color(0.4, 0.36, 0.5, 1)
+color = Color(0.42, 0.4, 0.45, 1)
 polygon = PackedVector2Array(-10, 205, 4, 205, 4, 345, -10, 345)
 [node name="Flag" type="Polygon2D" parent="Goal"]
-color = Color(0.65, 0.5, 0.9, 1)
+color = Color(0.45, 0.65, 0.95, 1)
 polygon = PackedVector2Array(2, 215, 40, 232, 2, 248)
 
-[node name="Walker1" parent="." instance=ExtResource("4_walker")]
-position = Vector2(600, 308)
-patrol_min_x = 520.0
-patrol_max_x = 700.0
-
 [node name="Flyer1" parent="." instance=ExtResource("5_flyer")]
-position = Vector2(400, 190)
-patrol_min_x = 320.0
-patrol_max_x = 480.0
-float_amplitude = 18.0
+position = Vector2(690, 255)
+patrol_min_x = 600.0
+patrol_max_x = 780.0
+float_amplitude = 20.0
 
 [node name="Flyer2" parent="." instance=ExtResource("5_flyer")]
-position = Vector2(850, 235)
-patrol_min_x = 780.0
-patrol_max_x = 920.0
-float_amplitude = 26.0
-
-[node name="Flyer3" parent="." instance=ExtResource("5_flyer")]
-position = Vector2(1250, 120)
-patrol_min_x = 1180.0
-patrol_max_x = 1320.0
+position = Vector2(1315, 255)
+patrol_min_x = 1230.0
+patrol_max_x = 1400.0
 float_amplitude = 22.0
 
-[node name="Flyer4" parent="." instance=ExtResource("5_flyer")]
-position = Vector2(1800, 180)
-patrol_min_x = 1720.0
-patrol_max_x = 1880.0
-float_amplitude = 24.0
+[node name="Hopper1" parent="." instance=ExtResource("4_hopper")]
+position = Vector2(2230, 308)
+patrol_min_x = 2190.0
+patrol_max_x = 2270.0
 
 [node name="Checkpoint1" parent="." instance=ExtResource("7_cp")]
-position = Vector2(950, 320)
+position = Vector2(900, 320)
 
 [node name="Checkpoint2" parent="." instance=ExtResource("7_cp")]
 position = Vector2(1700, 320)
 
 [node name="Gem1" parent="." instance=ExtResource("8_gem")]
-position = Vector2(1250, 55)
-
-[node name="AbilityShrine1" parent="." instance=ExtResource("9_shrine")]
-position = Vector2(200, 296)
+position = Vector2(1000, 88)
 
 [node name="Spawn" type="Marker2D" parent="."]
 position = Vector2(80, 308)
@@ -273,7 +216,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.6)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 40
-text = "森林王国 1-5"
+text = "森林王国 1-7"
 horizontal_alignment = 1
 [node name="CoinsLabel" type="Label" parent="HUD"]
 offset_left = 12.0
@@ -285,7 +228,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.55)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 24
-text = "金币 0/7    生命 3"
+text = "金币 0/6    生命 3"
 [node name="GemsLabel" type="Label" parent="HUD"]
 offset_left = 12.0
 offset_top = 42.0
@@ -297,17 +240,6 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 0.55)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 18
 text = "宝石 0/1"
-[node name="AbilityLabel" type="Label" parent="HUD"]
-visible = false
-anchor_right = 1.0
-offset_top = 195.0
-offset_bottom = 240.0
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_colors/font_color = Color(1, 0.92, 0.5, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 26
-horizontal_alignment = 1
 [node name="WinLabel" type="Label" parent="HUD"]
 visible = false
 offset_left = 120.0

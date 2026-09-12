@@ -162,6 +162,12 @@ def gen_sfx() -> None:
     t.add(0.0, tone((900, 650), 0.055, square, release=0.03), 0.7)
     t.write(os.path.join(d, "click.wav"))
 
+    # 获得能力：上滑琶音（闪亮上扬）
+    t = Track(0.6)
+    t.add(0.0, tone((300, 1200), 0.35, square, 0.4, release=0.2, vib=0.012), 0.75)
+    t.add(0.3, seq([784, 988, 1319], 0.09, square, 0.4, release=0.07), 0.6)
+    t.write(os.path.join(d, "powerup.wav"))
+
 
 # ---------- BGM 作曲器 ----------
 # C 大调五声音阶旋律（MIDI），0 = 休止，负数 = 延音（延长前一音）

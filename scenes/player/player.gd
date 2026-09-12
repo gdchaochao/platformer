@@ -16,6 +16,7 @@ extends CharacterBody2D
 @export var coyote_time: float = 0.10        # 离开平台后仍可起跳的宽容时间
 @export var hold_to_auto_jump: bool = true  # 按住跳跃键：落地瞬间自动再跳（连跳手感试验）
 @export var climb_speed: float = 120.0       # 梯子攀爬速度
+@export var double_jump_ratio: float = 0.92  # 二段跳力度（相对普通跳）
 # --------------------------
 
 var _jump_buffer: float = 0.0
@@ -26,6 +27,7 @@ var _down_block: bool = false    # 下爬落地脱梯后封锁↓，松开↓才
 var invulnerable: bool = false   # 受伤无敌帧期间忽略再次伤害
 var _climbing: bool = false      # 正在爬梯子
 var _active_ladder: Node2D = null  # 当前攀爬的梯子（下爬底端判定用）
+var _air_jumps_left: int = 0     # 剩余空中跳次数（二段跳能力：1，未解锁：0）
 
 
 func _physics_process(delta: float) -> void:
@@ -119,13 +121,21 @@ func _physics_process(delta: float) -> void:
 	velocity.y += gravity * g_mult * delta
 
 	# --- 起跳 ---
-	# 边沿触发（buffer + coyote） 或 按住连跳（落地即自动再跳）
+	# 优先级：地面跳（buffer+coyote 或 按住连跳）→ 空中二段跳（消耗剩余次数）
 	var can_jump: bool = _coyote > 0.0 and (_jump_buffer > 0.0 or (hold_to_auto_jump and jump_pressed))
 	if can_jump:
 		velocity.y = jump_velocity
 		_jump_buffer = 0.0
 		_coyote = 0.0
+		_air_jumps_left = _max_air_jumps()  # 地面起跳：空中跳次数充满
 		Game.play_sfx("jump")
+	elif _jump_buffer > 0.0 and _air_jumps_left > 0:
+		# 二段跳（未解锁能力时次数恒为 0，自然禁用）
+		velocity.y = jump_velocity * double_jump_ratio
+		_air_jumps_left -= 1
+		_jump_buffer = 0.0
+		_coyote = 0.0
+		Game.play_sfx("jump", -6.0, 1.3)  # 音调更高，区分二段跳
 
 	# --- 水平移动（地面/空中不同加速，移动时翻转朝向） ---
 	var accel: float = ground_accel if is_on_floor() else air_accel
@@ -136,7 +146,15 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, 0.0, friction * delta if is_on_floor() else ground_accel * 0.25 * delta)
 
 	move_and_slide()
+	# 落地边沿：空中跳次数重置
+	if is_on_floor() and not _on_ground_last:
+		_air_jumps_left = _max_air_jumps()
 	_on_ground_last = is_on_floor()
+
+
+## 可用空中跳次数：二段跳能力解锁后为 1，否则 0
+func _max_air_jumps() -> int:
+	return 1 if Game.has_ability("double_jump") else 0
 
 
 ## 是否与任意梯子（group "ladders"）重叠。
@@ -167,6 +185,7 @@ func _exit_climb(block_down: bool = false) -> void:
 	_climbing = false
 	_active_ladder = null
 	collision_mask = 1
+	_air_jumps_left = _max_air_jumps()  # 跳离/离开梯子：空中跳重置
 	if block_down:
 		_down_block = true
 
