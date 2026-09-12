@@ -17,6 +17,12 @@ extends CharacterBody2D
 @export var hold_to_auto_jump: bool = true  # 按住跳跃键：落地瞬间自动再跳（连跳手感试验）
 @export var climb_speed: float = 120.0       # 梯子攀爬速度
 @export var double_jump_ratio: float = 0.92  # 二段跳力度（相对普通跳）
+@export var wall_jump_hx: float = 260.0      # 蹬墙跳水平推力
+@export var wall_jump_vy: float = -480.0     # 蹬墙跳垂直初速
+@export var wall_slide_max: float = 90.0     # 贴墙滑降最大速度
+@export var dash_speed: float = 520.0        # 冲刺速度
+@export var dash_time: float = 0.18          # 冲刺持续时长
+@export var dash_cooldown: float = 0.5       # 冲刺冷却
 # --------------------------
 
 var _jump_buffer: float = 0.0
@@ -28,6 +34,10 @@ var invulnerable: bool = false   # 受伤无敌帧期间忽略再次伤害
 var _climbing: bool = false      # 正在爬梯子
 var _active_ladder: Node2D = null  # 当前攀爬的梯子（下爬底端判定用）
 var _air_jumps_left: int = 0     # 剩余空中跳次数（二段跳能力：1，未解锁：0）
+var _wall_lock: float = 0.0      # 蹬墙跳后的水平输入锁定（防立刻贴回）
+var _dash_left: float = 0.0      # 冲刺剩余时长
+var _dash_cd: float = 0.0        # 冲刺冷却剩余
+var _dash_held_last: bool = false
 
 
 func _physics_process(delta: float) -> void:
@@ -107,6 +117,32 @@ func _physics_process(delta: float) -> void:
 		_jump_buffer = maxf(_jump_buffer - delta, 0.0)
 	_jump_held_last = jump_pressed
 
+	# --- 冲刺输入与激活（能力未解锁时自然禁用） ---
+	var dash_pressed_poll: bool = Input.is_action_pressed("dash") \
+		or _down(KEY_SHIFT) or _down(KEY_X)
+	var dash_just: bool = Input.is_action_just_pressed("dash") \
+		or (dash_pressed_poll and not _dash_held_last)
+	_dash_held_last = dash_pressed_poll
+	_dash_cd = maxf(_dash_cd - delta, 0.0)
+	if dash_just and Game.has_ability("dash") and _dash_cd <= 0.0 and _dash_left <= 0.0:
+		_dash_left = dash_time
+		_dash_cd = dash_cooldown
+		_exit_climb(false)
+		var ddir: float = dir if dir != 0.0 else (1.0 if scale.x > 0.0 else -1.0)
+		velocity = Vector2(ddir * dash_speed, 0.0)
+		Game.play_sfx("dash")
+
+	# --- 冲刺帧：水平匀速、无重力，跳过常规移动 ---
+	if _dash_left > 0.0:
+		_dash_left -= delta
+		velocity.y = 0.0
+		velocity.x = signf(velocity.x) * dash_speed
+		move_and_slide()
+		if is_on_floor() and not _on_ground_last:
+			_air_jumps_left = _max_air_jumps()
+		_on_ground_last = is_on_floor()
+		return
+
 	# --- 土狼时间：离开平台边缘后的一小段时间仍允许起跳 ---
 	if is_on_floor():
 		_coyote = coyote_time
@@ -129,8 +165,23 @@ func _physics_process(delta: float) -> void:
 		_coyote = 0.0
 		_air_jumps_left = _max_air_jumps()  # 地面起跳：空中跳次数充满
 		Game.play_sfx("jump")
+
+	# --- 蹬墙跳（能力解锁后启用）：贴墙滑降减速，按跳向墙反方向弹出 ---
+	var on_wall: bool = is_on_wall_only() and Game.has_ability("wall_jump")
+	if on_wall and velocity.y > 0.0:
+		velocity.y = minf(velocity.y, wall_slide_max)
+	if on_wall and _jump_buffer > 0.0:
+		var n: float = get_wall_normal().x
+		velocity = Vector2(n * wall_jump_hx, wall_jump_vy)
+		_jump_buffer = 0.0
+		_coyote = 0.0
+		_wall_lock = 0.14          # 短暂锁水平输入，防止立刻按回贴墙
+		_air_jumps_left = _max_air_jumps()
+		_flip(n)
+		Game.play_sfx("wall_jump")
+
+	# --- 二段跳（未解锁能力时次数恒为 0，自然禁用） ---
 	elif _jump_buffer > 0.0 and _air_jumps_left > 0:
-		# 二段跳（未解锁能力时次数恒为 0，自然禁用）
 		velocity.y = jump_velocity * double_jump_ratio
 		_air_jumps_left -= 1
 		_jump_buffer = 0.0
@@ -138,12 +189,15 @@ func _physics_process(delta: float) -> void:
 		Game.play_sfx("jump", -6.0, 1.3)  # 音调更高，区分二段跳
 
 	# --- 水平移动（地面/空中不同加速，移动时翻转朝向） ---
+	_wall_lock = maxf(_wall_lock - delta, 0.0)
 	var accel: float = ground_accel if is_on_floor() else air_accel
-	if dir != 0.0:
-		velocity.x = move_toward(velocity.x, dir * move_speed, accel * delta)
-		_flip(dir)
-	else:
-		velocity.x = move_toward(velocity.x, 0.0, friction * delta if is_on_floor() else ground_accel * 0.25 * delta)
+	if _wall_lock <= 0.0:
+		# 蹬墙跳弹开期间保持速度，不读输入
+		if dir != 0.0:
+			velocity.x = move_toward(velocity.x, dir * move_speed, accel * delta)
+			_flip(dir)
+		else:
+			velocity.x = move_toward(velocity.x, 0.0, friction * delta if is_on_floor() else ground_accel * 0.25 * delta)
 
 	move_and_slide()
 	# 落地边沿：空中跳次数重置
@@ -214,6 +268,7 @@ func take_hit() -> void:
 	invulnerable = true
 	if _climbing:
 		_exit_climb(false)
+	_dash_left = 0.0  # 受伤打断冲刺
 	Game.play_sfx("hurt")
 	Game.hurt_player()
 	if not is_inside_tree():

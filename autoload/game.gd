@@ -27,6 +27,8 @@ const LEVEL_SEQUENCE: Array[Dictionary] = [
 	{ "scene": "res://scenes/levels/level_1_5.tscn", "world": "forest", "display": "森林王国 1-5 萤光林间", "grants": ["double_jump"] },
 	{ "scene": "res://scenes/levels/level_1_6.tscn", "world": "forest", "display": "森林王国 1-6 蛙鸣苔谷", "grants": ["double_jump"] },
 	{ "scene": "res://scenes/levels/level_1_7.tscn", "world": "forest", "display": "森林王国 1-7 云端回廊", "grants": ["double_jump"] },
+	{ "scene": "res://scenes/levels/level_1_8.tscn", "world": "forest", "display": "森林王国 1-8 回声峭壁", "grants": ["wall_jump"] },
+	{ "scene": "res://scenes/levels/level_1_9.tscn", "world": "forest", "display": "森林王国 1-9 疾风峡谷", "grants": ["wall_jump", "dash"] },
 ]
 
 var lives: int = 3
@@ -53,6 +55,8 @@ const SFX_PATHS: Dictionary = {
 	"gem": "res://assets/audio/sfx/gem.wav",
 	"checkpoint": "res://assets/audio/sfx/checkpoint.wav",
 	"powerup": "res://assets/audio/sfx/powerup.wav",
+	"wall_jump": "res://assets/audio/sfx/wall_jump.wav",
+	"dash": "res://assets/audio/sfx/dash.wav",
 }
 const MUSIC_PATHS: Dictionary = {
 	"menu": "res://assets/audio/music/menu_theme.wav",
@@ -126,6 +130,7 @@ func _setup_input() -> void:
 	_add_action("move_up", [KEY_W, KEY_UP])      # 梯子向上爬（攀爬状态中不触发跳跃）
 	_add_action("move_down", [KEY_S, KEY_DOWN])  # 梯子向下爬
 	_add_action("jump_space", [KEY_SPACE])       # 攀爬中按空格跳离梯子（与 W/↑ 区分）
+	_add_action("dash", [KEY_SHIFT, KEY_X, KEY_C])  # 冲刺（1-9 解锁）
 
 
 func _add_action(action: String, keys: Array) -> void:

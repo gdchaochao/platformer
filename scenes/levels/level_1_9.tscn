@@ -1,0 +1,292 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/levels/level_base.gd" id="1_lvl"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="FontFile" path="res://assets/fonts/fusion_pixel.otf" id="3_font"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/hopper.tscn" id="4_hopper"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/flyer.tscn" id="5_flyer"]
+[ext_resource type="PackedScene" path="res://scenes/objects/checkpoint.tscn" id="7_cp"]
+[ext_resource type="PackedScene" path="res://scenes/objects/gem.tscn" id="8_gem"]
+[ext_resource type="PackedScene" path="res://scenes/objects/ability_shrine.tscn" id="9_shrine"]
+
+[sub_resource type="RectangleShape2D" id="Sh_g1"]
+size = Vector2(800, 60)
+[sub_resource type="RectangleShape2D" id="Sh_g2"]
+size = Vector2(400, 60)
+[sub_resource type="RectangleShape2D" id="Sh_g3"]
+size = Vector2(400, 60)
+[sub_resource type="RectangleShape2D" id="Sh_g4"]
+size = Vector2(500, 60)
+[sub_resource type="RectangleShape2D" id="Sh_pa"]
+size = Vector2(130, 18)
+[sub_resource type="RectangleShape2D" id="Sh_kill"]
+size = Vector2(3800, 80)
+[sub_resource type="RectangleShape2D" id="Sh_goal"]
+size = Vector2(44, 130)
+[sub_resource type="CircleShape2D" id="Sh_coin"]
+radius = 14.0
+
+[node name="Level_1_9" type="Node2D"]
+script = ExtResource("1_lvl")
+sky_color = Color(0.75, 0.68, 0.55, 1)
+camera_limit_right = 3150.0
+
+[node name="Background" type="Node2D" parent="."]
+[node name="TreeA" type="Node2D" parent="Background"]
+position = Vector2(180, 320)
+[node name="Trunk" type="Polygon2D" parent="Background/TreeA"]
+color = Color(0.42, 0.34, 0.22, 1)
+polygon = PackedVector2Array(-5, -54, 5, -54, 7, 2, -7, 2)
+[node name="Foliage" type="Polygon2D" parent="Background/TreeA"]
+color = Color(0.52, 0.45, 0.26, 1)
+polygon = PackedVector2Array(0, -104, 27, -84, 24, -52, 0, -38, -24, -52, -27, -84)
+[node name="TreeB" type="Node2D" parent="Background"]
+position = Vector2(2500, 320)
+[node name="Trunk" type="Polygon2D" parent="Background/TreeB"]
+color = Color(0.42, 0.34, 0.22, 1)
+polygon = PackedVector2Array(-5, -54, 5, -54, 7, 2, -7, 2)
+[node name="Foliage" type="Polygon2D" parent="Background/TreeB"]
+color = Color(0.55, 0.47, 0.28, 1)
+polygon = PackedVector2Array(0, -104, 27, -84, 24, -52, 0, -38, -24, -52, -27, -84)
+
+[node name="Ground1" type="StaticBody2D" parent="."]
+position = Vector2(250, 350)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground1"]
+shape = SubResource("Sh_g1")
+[node name="Visual" type="Polygon2D" parent="Ground1"]
+color = Color(0.55, 0.48, 0.3, 1)
+polygon = PackedVector2Array(-400, -30, 400, -30, 400, 30, -400, 30)
+
+[node name="Ground2" type="StaticBody2D" parent="."]
+position = Vector2(1230, 350)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground2"]
+shape = SubResource("Sh_g2")
+[node name="Visual" type="Polygon2D" parent="Ground2"]
+color = Color(0.55, 0.48, 0.3, 1)
+polygon = PackedVector2Array(-200, -30, 200, -30, 200, 30, -200, 30)
+
+[node name="Ground3" type="StaticBody2D" parent="."]
+position = Vector2(2030, 350)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground3"]
+shape = SubResource("Sh_g3")
+[node name="Visual" type="Polygon2D" parent="Ground3"]
+color = Color(0.55, 0.48, 0.3, 1)
+polygon = PackedVector2Array(-200, -30, 200, -30, 200, 30, -200, 30)
+
+[node name="Ground4" type="StaticBody2D" parent="."]
+position = Vector2(2810, 350)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground4"]
+shape = SubResource("Sh_g4")
+[node name="Visual" type="Polygon2D" parent="Ground4"]
+color = Color(0.55, 0.48, 0.3, 1)
+polygon = PackedVector2Array(-250, -30, 250, -30, 250, 30, -250, 30)
+
+[node name="P_A" type="StaticBody2D" parent="."]
+position = Vector2(1230, 210)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="P_A"]
+shape = SubResource("Sh_pa")
+[node name="Visual" type="Polygon2D" parent="P_A"]
+color = Color(0.62, 0.55, 0.38, 1)
+polygon = PackedVector2Array(-65, -9, 65, -9, 65, 9, -65, 9)
+
+[node name="KillZone" type="Area2D" parent="." groups=["killzone"]]
+position = Vector2(1500, 470)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="KillZone"]
+shape = SubResource("Sh_kill")
+
+[node name="Coin1" type="Area2D" parent="." groups=["coins"]]
+position = Vector2(400, 290)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Coin1"]
+shape = SubResource("Sh_coin")
+[node name="Visual" type="Polygon2D" parent="Coin1"]
+color = Color(0.95, 0.82, 0.35, 1)
+polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
+[node name="Coin2" type="Area2D" parent="." groups=["coins"]]
+position = Vector2(840, 235)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Coin2"]
+shape = SubResource("Sh_coin")
+[node name="Visual" type="Polygon2D" parent="Coin2"]
+color = Color(0.95, 0.82, 0.35, 1)
+polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
+[node name="Coin3" type="Area2D" parent="." groups=["coins"]]
+position = Vector2(1230, 150)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Coin3"]
+shape = SubResource("Sh_coin")
+[node name="Visual" type="Polygon2D" parent="Coin3"]
+color = Color(0.95, 0.82, 0.35, 1)
+polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
+[node name="Coin4" type="Area2D" parent="." groups=["coins"]]
+position = Vector2(1650, 235)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Coin4"]
+shape = SubResource("Sh_coin")
+[node name="Visual" type="Polygon2D" parent="Coin4"]
+color = Color(0.95, 0.82, 0.35, 1)
+polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
+[node name="Coin5" type="Area2D" parent="." groups=["coins"]]
+position = Vector2(2250, 235)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Coin5"]
+shape = SubResource("Sh_coin")
+[node name="Visual" type="Polygon2D" parent="Coin5"]
+color = Color(0.95, 0.82, 0.35, 1)
+polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
+[node name="Coin6" type="Area2D" parent="." groups=["coins"]]
+position = Vector2(2950, 290)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Coin6"]
+shape = SubResource("Sh_coin")
+[node name="Visual" type="Polygon2D" parent="Coin6"]
+color = Color(0.95, 0.82, 0.35, 1)
+polygon = PackedVector2Array(9, 0, 6.5, 6.5, 0, 9, -6.5, 6.5, -9, 0, -6.5, -6.5, 0, -9, 6.5, -6.5)
+
+[node name="Goal" type="Area2D" parent="." groups=["goal"]]
+position = Vector2(2950, 0)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Goal"]
+position = Vector2(0, 275)
+shape = SubResource("Sh_goal")
+[node name="Pole" type="Polygon2D" parent="Goal"]
+color = Color(0.45, 0.4, 0.3, 1)
+polygon = PackedVector2Array(-10, 205, 4, 205, 4, 345, -10, 345)
+[node name="Flag" type="Polygon2D" parent="Goal"]
+color = Color(0.95, 0.7, 0.35, 1)
+polygon = PackedVector2Array(2, 215, 40, 232, 2, 248)
+
+[node name="Flyer1" parent="." instance=ExtResource("5_flyer")]
+position = Vector2(840, 245)
+patrol_min_x = 760.0
+patrol_max_x = 920.0
+float_amplitude = 20.0
+
+[node name="Flyer2" parent="." instance=ExtResource("5_flyer")]
+position = Vector2(2250, 245)
+patrol_min_x = 2170.0
+patrol_max_x = 2330.0
+float_amplitude = 22.0
+
+[node name="Hopper1" parent="." instance=ExtResource("4_hopper")]
+position = Vector2(2800, 308)
+patrol_min_x = 2620.0
+patrol_max_x = 2900.0
+
+[node name="Checkpoint1" parent="." instance=ExtResource("7_cp")]
+position = Vector2(1080, 320)
+
+[node name="Checkpoint2" parent="." instance=ExtResource("7_cp")]
+position = Vector2(1880, 320)
+
+[node name="Gem1" parent="." instance=ExtResource("8_gem")]
+position = Vector2(1230, 160)
+
+[node name="AbilityShrine1" parent="." instance=ExtResource("9_shrine")]
+position = Vector2(200, 296)
+ability = "dash"
+
+[node name="SignBoard" type="Polygon2D" parent="."]
+color = Color(0.55, 0.4, 0.26, 1)
+polygon = PackedVector2Array(-85, -26, 85, -26, 85, 6, -85, 6)
+position = Vector2(480, 262)
+[node name="SignPost" type="Polygon2D" parent="."]
+color = Color(0.45, 0.33, 0.22, 1)
+polygon = PackedVector2Array(-4, 6, 4, 6, 4, 50, -4, 50)
+position = Vector2(480, 262)
+[node name="SignText" type="Label" parent="."]
+offset_left = 380.0
+offset_top = 238.0
+offset_right = 580.0
+offset_bottom = 260.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(1, 0.97, 0.85, 1)
+theme_override_font_sizes/font_size = 13
+text = "按 Shift 冲刺，空中也能冲！"
+horizontal_alignment = 1
+
+[node name="Spawn" type="Marker2D" parent="."]
+position = Vector2(80, 308)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(80, 308)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+[node name="LevelTitle" type="Label" parent="HUD"]
+anchor_right = 1.0
+offset_top = 80.0
+offset_bottom = 140.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.6)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 40
+text = "森林王国 1-9"
+horizontal_alignment = 1
+[node name="CoinsLabel" type="Label" parent="HUD"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 400.0
+offset_bottom = 40.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.55)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "金币 0/6    生命 3"
+[node name="GemsLabel" type="Label" parent="HUD"]
+offset_left = 12.0
+offset_top = 42.0
+offset_right = 400.0
+offset_bottom = 70.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(0.6, 0.95, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.55)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "宝石 0/1"
+[node name="AbilityLabel" type="Label" parent="HUD"]
+visible = false
+anchor_right = 1.0
+offset_top = 195.0
+offset_bottom = 240.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(1, 0.92, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+[node name="WinLabel" type="Label" parent="HUD"]
+visible = false
+offset_left = 120.0
+offset_top = 150.0
+offset_right = 520.0
+offset_bottom = 190.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.65)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 36
+horizontal_alignment = 1
+[node name="GameOverRect" type="ColorRect" parent="HUD"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.08, 0.05, 0.6)
+[node name="GameOverTitle" type="Label" parent="HUD"]
+visible = false
+anchor_right = 1.0
+offset_top = 120.0
+offset_bottom = 190.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(0.95, 0.4, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 72
+text = "游戏结束"
+horizontal_alignment = 1
+[node name="GameOverHint" type="Label" parent="HUD"]
+visible = false
+anchor_right = 1.0
+offset_top = 210.0
+offset_bottom = 250.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "按 空格键 重新开始"
+horizontal_alignment = 1

@@ -168,6 +168,18 @@ def gen_sfx() -> None:
     t.add(0.3, seq([784, 988, 1319], 0.09, square, 0.4, release=0.07), 0.6)
     t.write(os.path.join(d, "powerup.wav"))
 
+    # 蹬墙跳：短促踢墙（低频快扫）
+    t = Track(0.14)
+    t.add(0.0, tone((180, 620), 0.1, square, 0.45, release=0.05), 0.85)
+    t.add(0.0, noise_burst(0.04, 0.5), 0.2)
+    t.write(os.path.join(d, "wall_jump.wav"))
+
+    # 冲刺：嗖（噪声 + 下滑锯齿）
+    t = Track(0.22)
+    t.add(0.0, tone((1300, 300), 0.16, saw, release=0.1), 0.55)
+    t.add(0.0, noise_burst(0.14, 0.82), 0.45)
+    t.write(os.path.join(d, "dash.wav"))
+
 
 # ---------- BGM 作曲器 ----------
 # C 大调五声音阶旋律（MIDI），0 = 休止，负数 = 延音（延长前一音）
