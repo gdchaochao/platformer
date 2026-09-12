@@ -15,7 +15,7 @@ const LEVEL_CLEAR: String = "res://scenes/ui/level_clear.tscn"   # 全通关结�
 
 ## ⚠️ 调试开关：主菜单显示"关卡选择"面板，可跳任意关（测试用）。
 ## 正式上线前改为 false。
-const DEBUG_LEVEL_SELECT: bool = true
+const DEBUG_LEVEL_SELECT: bool = false
 
 # 关卡顺序表（推进主干）。水墨 World2 接入示例：
 #   { "scene": "res://scenes/levels/world2_ink/level_2_1.tscn", "world": "ink", "display": "水墨山水 2-1" }
