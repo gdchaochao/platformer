@@ -10,6 +10,7 @@ signal game_over     # 生命耗尽：关卡负责显示 Game Over 画面
 
 const START_LEVEL: String = "res://scenes/levels/level_1_1.tscn"
 const MAIN_MENU: String = "res://scenes/ui/main_menu.tscn"
+const LEVEL_CLEAR: String = "res://scenes/ui/level_clear.tscn"   # 全通关结算页
 
 ## ⚠️ 调试开关：主菜单显示"关卡选择"面板，可跳任意关（测试用）。
 ## 正式上线前改为 false。
@@ -28,6 +29,7 @@ var lives: int = 3
 var coins: int = 0
 var gems: int = 0   # 大宝石（每关稀有收集品）
 var is_game_over: bool = false
+var run_elapsed_ms: int = 0   # 本轮用时（结算页展示；reset_run 清零）
 
 # ---------- 音频 ----------
 const SFX_PATHS: Dictionary = {
@@ -130,15 +132,22 @@ func _add_action(action: String, keys: Array) -> void:
 		InputMap.action_add_event(action, ev_phys)
 
 
-## 开始新的一轮（生命/金币归零）
+## 开始新的一轮（生命/金币归零、计时清零）
 func reset_run() -> void:
 	is_game_over = false
 	lives = 3
 	coins = 0
 	gems = 0
+	run_elapsed_ms = 0
 	coins_changed.emit(coins)
 	gems_changed.emit(gems)
 	lives_changed.emit(lives)
+
+
+## 本轮用时累计（结算页展示）
+func _process(delta: float) -> void:
+	if not is_game_over:
+		run_elapsed_ms += int(delta * 1000.0)
 
 
 ## 拾取金币
@@ -169,19 +178,26 @@ func hurt_player() -> void:
 		player_hurt.emit()
 
 
-## 通关：看顺序表里还有没有下一关；全通完回主菜单
+## 通关：写入存档（每关最佳记录）；还有下一关则推进，全通完进结算页
 func on_level_cleared(current_scene_path: String) -> void:
 	var idx: int = _index_of(current_scene_path)
 	if idx < 0:
 		return
+	SaveManager.record_level_result(current_scene_path, coins, gems, true)
 	if idx + 1 < LEVEL_SEQUENCE.size():
 		var next_level: Dictionary = LEVEL_SEQUENCE[idx + 1]
 		print("进入下一关: %s" % next_level["display"])
 		get_tree().change_scene_to_file(next_level["scene"])
 	else:
-		print("全部关卡完成！")
-		reset_run()
-		get_tree().change_scene_to_file(MAIN_MENU)
+		print("全部关卡完成！进入结算")
+		# 不 reset_run：结算页要展示本局的金币/宝石/用时，回主菜单时再清零
+		get_tree().change_scene_to_file(LEVEL_CLEAR)
+
+
+## 用时格式化：mm:ss
+func format_time(ms: int) -> String:
+	var total_sec := ms / 1000
+	return "%02d:%02d" % [total_sec / 60, total_sec % 60]
 
 
 ## 取关卡显示名（供关卡开场标题用）

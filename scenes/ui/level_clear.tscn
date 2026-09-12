@@ -1,0 +1,111 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/level_clear.gd" id="1_clear"]
+[ext_resource type="FontFile" path="res://assets/fonts/fusion_pixel.otf" id="2_font"]
+
+[node name="LevelClear" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_clear")
+
+[node name="Bg" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.15, 0.17, 0.28, 1)
+
+[node name="Star1" type="Polygon2D" parent="."]
+color = Color(1, 1, 1, 0.8)
+polygon = PackedVector2Array(0, -2, 2, 0, 0, 2, -2, 0)
+position = Vector2(90, 60)
+[node name="Star2" type="Polygon2D" parent="."]
+color = Color(1, 1, 1, 0.6)
+polygon = PackedVector2Array(0, -2, 2, 0, 0, 2, -2, 0)
+position = Vector2(560, 45)
+[node name="Star3" type="Polygon2D" parent="."]
+color = Color(1, 1, 1, 0.5)
+polygon = PackedVector2Array(0, -2, 2, 0, 0, 2, -2, 0)
+position = Vector2(480, 300)
+[node name="Star4" type="Polygon2D" parent="."]
+color = Color(1, 1, 1, 0.7)
+polygon = PackedVector2Array(0, -2, 2, 0, 0, 2, -2, 0)
+position = Vector2(140, 280)
+
+[node name="Panel" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Title" type="Label" parent="Panel"]
+anchor_right = 1.0
+offset_top = 44.0
+offset_bottom = 120.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.08, 0.2, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 56
+text = "恭喜通关！"
+horizontal_alignment = 1
+
+[node name="Sub" type="Label" parent="Panel"]
+anchor_right = 1.0
+offset_top = 128.0
+offset_bottom = 156.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(0.85, 0.88, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "森林王国全四章 · 冒险完成"
+horizontal_alignment = 1
+
+[node name="StatsBox" type="ColorRect" parent="Panel"]
+offset_left = 200.0
+offset_top = 176.0
+offset_right = 440.0
+offset_bottom = 276.0
+color = Color(1, 1, 1, 0.08)
+
+[node name="CoinsLabel" type="Label" parent="Panel"]
+offset_left = 220.0
+offset_top = 186.0
+offset_right = 420.0
+offset_bottom = 212.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(0.95, 0.75, 0.25, 1)
+theme_override_font_sizes/font_size = 22
+text = "金币  0"
+[node name="GemsLabel" type="Label" parent="Panel"]
+offset_left = 220.0
+offset_top = 216.0
+offset_right = 420.0
+offset_bottom = 242.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(0.4, 0.85, 0.75, 1)
+theme_override_font_sizes/font_size = 22
+text = "宝石  0"
+[node name="TimeLabel" type="Label" parent="Panel"]
+offset_left = 220.0
+offset_top = 246.0
+offset_right = 420.0
+offset_bottom = 272.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(0.85, 0.88, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "用时  00:00"
+
+[node name="MenuButton" type="Button" parent="Panel"]
+offset_left = 250.0
+offset_top = 296.0
+offset_right = 390.0
+offset_bottom = 328.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 22
+text = "回到主菜单"
+
+[node name="Hint" type="Label" parent="Panel"]
+anchor_right = 1.0
+offset_top = 336.0
+offset_bottom = 356.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(1, 1, 1, 0.65)
+theme_override_font_sizes/font_size = 14
+text = "按 空格键 回到主菜单"
+horizontal_alignment = 1
