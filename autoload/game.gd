@@ -23,6 +23,8 @@ const LEVEL_SEQUENCE: Array[Dictionary] = [
 	{ "scene": "res://scenes/levels/level_1_2.tscn", "world": "forest", "display": "森林王国 1-2 黄昏林地" },
 	{ "scene": "res://scenes/levels/level_1_3.tscn", "world": "forest", "display": "森林王国 1-3 暮色高塔" },
 	{ "scene": "res://scenes/levels/level_1_4.tscn", "world": "forest", "display": "森林王国 1-4 浮空石林" },
+	{ "scene": "res://scenes/levels/level_1_5.tscn", "world": "forest", "display": "森林王国 1-5 萤光林间" },
+	{ "scene": "res://scenes/levels/level_1_6.tscn", "world": "forest", "display": "森林王国 1-6 蛙鸣苔谷" },
 ]
 
 var lives: int = 3
