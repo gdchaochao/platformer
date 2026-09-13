@@ -103,6 +103,10 @@ offset_left = 225.0
 offset_top = 244.0
 offset_right = 415.0
 offset_bottom = 358.0
+[node name="DebugBg" type="ColorRect" parent="UI/DebugPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.1, 0.05, 0.72)
 [node name="DebugTitle" type="Label" parent="UI/DebugPanel"]
 anchor_right = 1.0
 offset_bottom = 22.0
@@ -113,8 +117,12 @@ theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 18
 text = "关卡选择 · 测试"
 horizontal_alignment = 1
-[node name="LevelSelectBox" type="VBoxContainer" parent="UI/DebugPanel"]
+[node name="LevelScroll" type="ScrollContainer" parent="UI/DebugPanel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 26.0
-theme_override_constants/separation = 6
+horizontal_scroll_mode = 0
+[node name="LevelGrid" type="GridContainer" parent="UI/DebugPanel/LevelScroll"]
+columns = 3
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 5

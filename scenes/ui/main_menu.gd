@@ -4,7 +4,7 @@ extends Node2D
 ## DEBUG_LEVEL_SELECT = true 时右侧显示"关卡选择"测试面板（可跳任意关）。
 
 @onready var _debug_panel: Control = $UI/DebugPanel
-@onready var _level_box: VBoxContainer = $UI/DebugPanel/LevelSelectBox
+@onready var _level_grid: GridContainer = $UI/DebugPanel/LevelScroll/LevelGrid
 
 
 func _ready() -> void:
@@ -50,6 +50,7 @@ func _start() -> void:
 
 
 ## 测试用关卡选择面板：动态读取关卡顺序表生成按钮。
+## 3 列紧凑网格 + 滚动容器兜底，关卡再多也不溢出画面。
 ## 显隐由 Game.DEBUG_LEVEL_SELECT 控制，上线改 false 即整体隐藏。
 func _build_level_select() -> void:
 	_debug_panel.visible = Game.DEBUG_LEVEL_SELECT
@@ -57,13 +58,21 @@ func _build_level_select() -> void:
 		return
 	var font: Font = load("res://assets/fonts/fusion_pixel.otf")
 	for entry: Dictionary in Game.LEVEL_SEQUENCE:
+		var display: String = str(entry["display"])
 		var b := Button.new()
-		b.text = str(entry["display"])
-		b.custom_minimum_size = Vector2(190, 26)
+		b.text = _short_label(display)          # 按钮只显示 "1-1" 这样的短编号
+		b.tooltip_text = display                 # 鼠标悬停可看完整关卡名
+		b.custom_minimum_size = Vector2(56, 24)
 		b.add_theme_font_override("font", font)
 		b.add_theme_font_size_override("font_size", 14)
 		b.pressed.connect(_goto_level.bind(str(entry["scene"])))
-		_level_box.add_child(b)
+		_level_grid.add_child(b)
+
+
+## "森林王国 1-1 苏醒之林" → "1-1"（取第二段；格式不符则回退原文本）
+func _short_label(display: String) -> String:
+	var parts := display.split(" ", false)
+	return parts[1] if parts.size() >= 2 else display
 
 
 func _goto_level(scene_path: String) -> void:
