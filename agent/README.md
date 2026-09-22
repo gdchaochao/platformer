@@ -99,6 +99,26 @@ Other levels (1-2/1-3/1-4) are **not yet** cleared by the executor: they need
 ladder support (1-3) and moving-platform support (1-4); 1-2 needs hazard/
 platform tuning. See `PLAN` notes in the project memory.
 
+## Recording a run to video
+
+`replay_runner.gd/.tscn` replays a recorded per-frame input list **unstoppable**
+so the level can be rendered. `driver.py --trace <file>` saves the actions;
+`make_replay.py` flattens them to one input dict per physics frame; then Godot's
+Movie Maker (under Xvfb) renders it to AVI:
+
+```bash
+python3 agent/driver.py --brain jev_nav --trace /tmp/run.json --quiet
+python3 agent/make_replay.py /tmp/run.json /tmp/frames.json
+xvfb-run -a -s "-screen 0 1280x720x24" \
+  env PF_REPLAY=/tmp/frames.json PF_LEVEL=res://scenes/levels/level_1_1.tscn \
+  godot --path . --write-movie /tmp/out.avi --fixed-fps 60 res://agent/replay_runner.tscn
+ffmpeg -y -i /tmp/out.avi -c:v libx264 -pix_fmt yuv420p -crf 23 /tmp/out.mp4
+```
+
+The runner quits ~1.3 s after the goal (before the level auto-advances), so the
+win banner is captured and the recording stops cleanly. Sample output:
+`media/jev-wins-level_1_1.mp4`.
+
 ## Harness implementation notes / gotchas
 
 * The runner node is `PROCESS_MODE_ALWAYS`, but the **level is explicitly set

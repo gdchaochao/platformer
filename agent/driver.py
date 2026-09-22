@@ -554,7 +554,7 @@ def run_episode(args, brain):
             p0 = st["player"]
             trace.append({"turn": steps, "t": st["time"], "x": p0["x"], "y": p0["y"],
                           "on_floor": p0["on_floor"], "lives": st["lives"],
-                          "action": [{"keys": list(i.keys()), "frames": f} for i, f in seq]})
+                          "action": [{"keys": [k for k, v in i.items() if v], "frames": f} for i, f in seq]})
             if not args.quiet:
                 print("turn %3d t=%5.2fs pos=(%.0f,%.0f) floor=%s -> %s" % (
                     steps, st["time"], p0["x"], p0["y"], p0["on_floor"],
