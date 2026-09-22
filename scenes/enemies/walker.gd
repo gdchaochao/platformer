@@ -23,6 +23,11 @@ var _dir: float = -1.0
 @onready var _edge_ray: RayCast2D = $EdgeRay
 
 
+func _ready() -> void:
+	# 供智能体/调试读取场景内的敌人（agent harness 用 group 约定）
+	add_to_group("enemies")
+
+
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += ProjectSettings.get_setting("physics/2d/default_gravity") * delta

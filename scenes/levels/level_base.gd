@@ -22,7 +22,7 @@ var _game_over_at_ms: int = 0
 @onready var _player: CharacterBody2D = $Player
 @onready var _spawn: Marker2D = $Spawn
 @onready var _coins_label: Label = $HUD/CoinsLabel
-@onready var _gems_label: Label = $HUD/GemsLabel  # 老场景可缺省
+@onready var _gems_label: Label = get_node_or_null("HUD/GemsLabel")  # 老场景可缺省（如 level_1_1）
 @onready var _win_label: Label = $HUD/WinLabel
 @onready var _title_label: Label = $HUD/LevelTitle
 

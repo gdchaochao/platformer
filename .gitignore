@@ -7,3 +7,7 @@
 # 导出产物
 *.tmp
 build/
+
+# python
+__pycache__/
+*.pyc
